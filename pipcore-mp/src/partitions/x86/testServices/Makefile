@@ -33,7 +33,7 @@
 
 include ../toolchain.mk
 LIBGCC=$(shell dirname $(shell gcc -print-libgcc-file-name -m32))
-LIBFREERTOS=libfreertos/
+
 LIBFREERTOS_LIB=$(LIBFREERTOS)/lib/
 LIBFREERTOS_INC=$(LIBFREERTOS)/include
 CFLAGS=-m32 -c -nostdlib --freestanding -I$(LIBPIP)/include/ -I$(LIBPIP)/arch/x86/include/ -I$(LIBFREERTOS_INC) -fno-pic -no-pie -fno-stack-protector

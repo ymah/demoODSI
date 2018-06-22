@@ -16,6 +16,7 @@ else
     make -C ../libpip/ clean all
 fi
 
+make -C ../libfreertos clean all 
 
 echo "Owner" && sleep 1
 make -C src/partitions/x86/owner/ all

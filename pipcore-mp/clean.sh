@@ -40,3 +40,5 @@ yes | cp src/partitions/x86/NetworkMngr/pip-freertos.bin src/partitions/x86/pip-
 make -B -C src/partitions/x86/pip-freertos/ clean
 
 make mrproper
+
+make -C ../libfreertos clean 

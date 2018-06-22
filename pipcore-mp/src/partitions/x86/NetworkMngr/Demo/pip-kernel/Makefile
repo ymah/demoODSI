@@ -12,7 +12,7 @@ MAPFILE=RTOSDemo.map
 
 #FreeRTOS library
 
-LIBFREERTOS=libfreertos/
+
 LIBFREERTOS_LIB=$(LIBFREERTOS)/lib/
 LIBFREERTOS_INC=$(LIBFREERTOS)/include/
 # LibPepin directory
