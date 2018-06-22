@@ -1,0 +1,102 @@
+# Prerequisites
+<<<<<<< HEAD
+*.tags
+*.d
+*.fun
+*.json
+*.dep
+git.h
+=======
+*.d
+
+>>>>>>> 117a9d6db5c85db9a5601e4a29d6e12ea6f09fba
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+<<<<<<< HEAD
+*.bin
+=======
+
+>>>>>>> 117a9d6db5c85db9a5601e4a29d6e12ea6f09fba
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+<<<<<<< HEAD
+
+pipcore-mp/build/*
+.*.aux
+*.aux
+*.a
+*.cma
+*.cmi
+*.cmo
+*.cmx
+*.cmxa
+*.cmxs
+*.glob
+*.ml.d
+*.ml4.d
+*.mli.d
+*.mllib.d
+*.mlpack.d
+*.native
+*.o
+*.v.d
+*.vio
+*.vo
+.coq-native/
+.csdp.cache
+.lia.cache
+.nia.cache
+.nlia.cache
+.nra.cache
+csdp.cache
+lia.cache
+nia.cache
+nlia.cache
+nra.cache
+
+=======
+>>>>>>> 117a9d6db5c85db9a5601e4a29d6e12ea6f09fba
