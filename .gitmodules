@@ -1,13 +1,13 @@
 [submodule "libodsi"]
     path = libodsi
-    url = git@github.com:ymah/libodsi.git
+    url = https://github.com/ymah/libodsi.git
 [submodule "pip-freertos"]
     path = pipcore-mp/src/partitions/x86/pip-freertos
-    url = git@github.com:ymah/pip-freertos.git
+    url = https://github.com/ymah/pip-freertos.git
 [submodule "libfreertos"]
 	path = libfreertos
-	url = git@github.com:ymah/libfreertos.git
+	url = https://github.com/ymah/libfreertos.git
 
 [submodule "demo_gpio"]
     path = pipcore-mp/src/partitions/x86/demo_gpio
-    url = git@github.com:ymah/demo_gpio.git
+    url = https://github.com/ymah/demo_gpio.git
