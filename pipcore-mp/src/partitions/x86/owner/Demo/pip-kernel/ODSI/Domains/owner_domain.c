@@ -30,21 +30,14 @@
 
 void od_Task( uint32_t * pvParameters )
 {
+	//for(;;)
+	printf("Starting OD TASK\r\n");
 
-	uint32_t * queueTab;
-	printf("Queues provided by my father \r\n");
-  queueTab = pvPortMalloc(5*sizeof(uint32_t));
-  for(int i =1;i<=5;i++){
-    queueTab[i-1] = *(uint32_t*)( pvParameters+ sizeof(int)*i);
-    printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
-  }
-  printf("Starting OD task with %x\r\n",queueTab);
-
-	QueueHandle_t xQueue_2NW = (QueueHandle_t*) queueTab[0];
-	QueueHandle_t xQueue_2OD = (QueueHandle_t*) queueTab[1];
-	QueueHandle_t xQueue_2SP1D = (QueueHandle_t*) queueTab[2];
-	QueueHandle_t xQueue_2SP2D = (QueueHandle_t*) queueTab[3];
-	QueueHandle_t xQueue_2SP3D = (QueueHandle_t*) queueTab[4];
+	QueueHandle_t xQueue_2NW = (QueueHandle_t) pvParameters[0];
+	QueueHandle_t xQueue_2OD = (QueueHandle_t) pvParameters[1];
+	QueueHandle_t xQueue_2SP1D = (QueueHandle_t) pvParameters[2];
+	QueueHandle_t xQueue_2SP2D = (QueueHandle_t) pvParameters[3];
+	QueueHandle_t xQueue_2SP3D = (QueueHandle_t) pvParameters[4];
 
 	printf("Queue are OK\r\n");
 	event_t EventPartition;
@@ -62,12 +55,16 @@ void od_Task( uint32_t * pvParameters )
 	( void ) pvParameters;
 
 	printf("Starting work\r\n");
+
 	for( ;; )
 	{
 		/* Receive data from Network manager or from Administration Manager*/
 		// appelle bloquant
 		DEBUG(INFO,"Receiving packet...\r\n");
+		printf("Receiving packet...\r\n");
+
 		EventPartition = myreceive(INMES, xQueue_2OD);
+
 		printf("Received something\r\n");
 		incomingMessagecpy(&Check, &(EventPartition.eventData.incomingMessage) );
 		DEBUG(INFO,"UserID: %lu, DeviceID: %lu, DomainID: %lu, Instruction: %lu, Command Data: %s\r\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);

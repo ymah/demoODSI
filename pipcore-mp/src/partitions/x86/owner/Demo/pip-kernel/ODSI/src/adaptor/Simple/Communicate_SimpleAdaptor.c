@@ -37,6 +37,7 @@
 event_t myreceive(char* data, QueueHandle_t xQueue_P2IC)
 {
 	printf("Starting myreceive\r\n");
+	for(;;);
 	event_t * EventToReturn = (event_t*) allocPage();
 
 	printf("Event reset\r\n");

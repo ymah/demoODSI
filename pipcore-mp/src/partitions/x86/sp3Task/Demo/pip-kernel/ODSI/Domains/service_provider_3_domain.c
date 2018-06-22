@@ -26,8 +26,12 @@
 #include <queue.h>
 /*-----------------------------------------------------------*/
 
-void SP3D_Task( void *pvParameters )
+void
+SP3D_Task( void *pvParameters )
 {
+
+	//for(;;)
+		printf("Starting SP3_D task\r\n");
 	/*QueueHandle_t xQueue_2AM = ( (QueueHandle_t*) pvParameters)[0];
 	QueueHandle_t xQueue_2IC = ( (QueueHandle_t*) pvParameters)[1];
 	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[5];
@@ -35,7 +39,7 @@ void SP3D_Task( void *pvParameters )
 
 	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[0];
 	QueueHandle_t xQueue_2OD_IC = ( (QueueHandle_t*) pvParameters)[1];
-	QueueHandle_t xQueue_2SP3D = ( (QueueHandle_t*) pvParameters)[4];
+	QueueHandle_t xQueue_2SP3D = ( (QueueHandle_t*) pvParameters)[2];
 
 	event_t EventPartition;
 	event_t EventResponse;

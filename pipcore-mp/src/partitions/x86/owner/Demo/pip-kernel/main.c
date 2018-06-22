@@ -313,8 +313,9 @@ void main()
 
   //od_Task2( 0xDEADBEEF );
 
-  xTaskCreate(&od_Task,"Owner tas",configMINIMAL_STACK_SIZE*5,0xFFFFA000,configMAX_PRIORITIES-1,NULL);
-  vTaskStartScheduler();
+  //xTaskCreate(&od_Task,"Owner tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
+  od_Task(queueTab);
+  //vTaskStartScheduler();
 }
 
 
