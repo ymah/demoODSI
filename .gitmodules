@@ -8,4 +8,6 @@
 	path = libfreertos
 	url = git@github.com:ymah/libfreertos.git
 
-
+[submodule "demo_gpio"]
+    path = pipcore-mp/src/partitions/x86/demo_gpio
+    url = git@github.com:ymah/demo_gpio.git
