@@ -5,7 +5,7 @@
     path = pipcore-mp/src/partitions/x86/pip-freertos
     url = git@github.com:ymah/pip-freertos.git
 [submodule "libfreertos"]
-    path = libfreertos
-    url = git@github.com:ymah/libfreertos.git
+	path = libfreertos
+	url = git@github.com:ymah/libfreertos.git
 
 
