@@ -86,12 +86,12 @@ struct AMessage
 };
 void main()
 {
-  int i;
+    int i;
     pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
     //Get Bootinfo for the available memory
     parse_bootinfo(bootinfo);
 
-    uint32_t * parameters = (uint32_t*)0xFFFFF000;
+    uint32_t * parameters = (uint32_t*)0xFFFFA000;
 
     for(i=0;i<5;i++){
       printf("%x\r\n",parameters[i]);
