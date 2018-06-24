@@ -25,10 +25,13 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include <pip/api.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
 
 /*-----------------------------------------------------------*/
 
-void od_Task( uint32_t * pvParameters )
+	void od_Task( uint32_t * pvParameters )
 {
 	//for(;;)
 	printf("Starting OD TASK\r\n");
@@ -45,8 +48,11 @@ void od_Task( uint32_t * pvParameters )
 	event_t MessageToReturn;
 	incomingMessage_t Check;
 
-	char INMES[IN_MAX_MESSAGE_SIZE];
-	char OUTMES[OUT_MAX_MESSAGE_SIZE];
+	//char INMES[IN_MAX_MESSAGE_SIZE];
+	char * INMES = (char*)allocPage();
+	char * OUTMES = (char*)allocPage();
+	//char OUTMES[OUT_MAX_MESSAGE_SIZE];
+
 	uint32_t sizeout;
 	uint32_t j;
 
@@ -60,11 +66,11 @@ void od_Task( uint32_t * pvParameters )
 	{
 		/* Receive data from Network manager or from Administration Manager*/
 		// appelle bloquant
-		DEBUG(INFO,"Receiving packet...\r\n");
-		printf("Receiving packet...\r\n");
+		printf("Receiving packet\r\n");
+
 
 		EventPartition = myreceive(INMES, xQueue_2OD);
-
+		for(;;);
 		printf("Received something\r\n");
 		incomingMessagecpy(&Check, &(EventPartition.eventData.incomingMessage) );
 		DEBUG(INFO,"UserID: %lu, DeviceID: %lu, DomainID: %lu, Instruction: %lu, Command Data: %s\r\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);

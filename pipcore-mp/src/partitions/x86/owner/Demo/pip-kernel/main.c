@@ -296,6 +296,7 @@ void od_Task2()
 void main()
 {
 
+
   pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
   //Get Bootinfo for the available memory
 	parse_bootinfo(bootinfo);
@@ -314,6 +315,7 @@ void main()
   //od_Task2( 0xDEADBEEF );
 
   //xTaskCreate(&od_Task,"Owner tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
+
   od_Task(queueTab);
   //vTaskStartScheduler();
 }

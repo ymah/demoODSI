@@ -27,7 +27,7 @@
 /*-----------------------------------------------------------*/
 
 void
-SP3D_Task( void *pvParameters )
+SP3D_Task( uint32_t *pvParameters )
 {
 
 	//for(;;)
@@ -37,9 +37,9 @@ SP3D_Task( void *pvParameters )
 	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[5];
 	QueueHandle_t xQueue_P2IC = ( (QueueHandle_t*) pvParameters)[6];*/
 
-	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[0];
-	QueueHandle_t xQueue_2OD_IC = ( (QueueHandle_t*) pvParameters)[1];
-	QueueHandle_t xQueue_2SP3D = ( (QueueHandle_t*) pvParameters)[2];
+	QueueHandle_t xQueue_2NW =  (QueueHandle_t) pvParameters[0];
+	QueueHandle_t xQueue_2OD_IC =  (QueueHandle_t) pvParameters[1];
+	QueueHandle_t xQueue_2SP3D =(QueueHandle_t) pvParameters[2];
 
 	event_t EventPartition;
 	event_t EventResponse;

@@ -24,7 +24,7 @@
 #include "task.h"
 #include "semphr.h"
 
-#include <queue.h>
+#include <queueGlue.h>
 
 
 #include <pip/fpinfo.h>
@@ -33,17 +33,20 @@
 #include <pip/api.h>
 #include <pip/compat.h>
 
-
+event_t * EventToReturn = NULL;
 event_t myreceive(char* data, QueueHandle_t xQueue_P2IC)
 {
 	printf("Starting myreceive\r\n");
-	for(;;);
-	event_t * EventToReturn = (event_t*) allocPage();
+
+	if(!EventToReturn)
+		EventToReturn = (event_t*) allocPage();
 
 	printf("Event reset\r\n");
 	//eventreset(EventToReturn);
 	printf("Receive something from %x to %x\r\n",xQueue_P2IC,EventToReturn);
+
 	xProtectedQueueReceive( xQueue_P2IC, EventToReturn, portMAX_DELAY );
+	for(;;);
 	printf("Received\r\n");
 	return (event_t)*EventToReturn;
 }
