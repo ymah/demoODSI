@@ -24,26 +24,36 @@
 #include "task.h"
 #include "semphr.h"
 #include <queue.h>
+
+
+#include <pip/api.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
+
 /*-----------------------------------------------------------*/
 
-void SP3D_Task( void *pvParameters )
+void
+SP3D_Task( uint32_t *pvParameters )
 {
+
+	//for(;;)
+		printf("Starting SP3_D task\r\n");
 	/*QueueHandle_t xQueue_2AM = ( (QueueHandle_t*) pvParameters)[0];
 	QueueHandle_t xQueue_2IC = ( (QueueHandle_t*) pvParameters)[1];
 	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[5];
 	QueueHandle_t xQueue_P2IC = ( (QueueHandle_t*) pvParameters)[6];*/
 
-	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[0];
-	QueueHandle_t xQueue_2OD_IC = ( (QueueHandle_t*) pvParameters)[1];
-	QueueHandle_t xQueue_2SP3D = ( (QueueHandle_t*) pvParameters)[4];
+	QueueHandle_t xQueue_2NW =  (QueueHandle_t) pvParameters[0];
+	QueueHandle_t xQueue_2OD_IC =  (QueueHandle_t) pvParameters[1];
+	QueueHandle_t xQueue_2SP3D =(QueueHandle_t) pvParameters[2];
 
 	event_t EventPartition;
 	event_t EventResponse;
 	event_t MessageToReturn;
 	incomingMessage_t Check;
 
-	char INMES[IN_MAX_MESSAGE_SIZE];
-	char OUTMES[OUT_MAX_MESSAGE_SIZE];
+	char * INMES = (char*)allocPage();
+	char * OUTMES = (char*)allocPage();
 	uint32_t sizeout;
 	uint32_t j;
 

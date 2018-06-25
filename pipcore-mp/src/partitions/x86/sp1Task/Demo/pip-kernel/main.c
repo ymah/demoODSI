@@ -281,16 +281,16 @@ void main()
 
     printf("Queues provided by my father \r\n");
     queueTab = pvPortMalloc(5*sizeof(uint32_t));
-    for(int i =1;i<=5;i++){
+    for(int i =1;i<=3;i++){
       queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
       printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
     }
     printf("Starting OD task with %x\r\n",queueTab);
 
   //od_Task2( 0xDEADBEEF );
-
-    xTaskCreate(&SP1D_Task,"SP1D tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
-    vTaskStartScheduler();
+  	   SP1D_Task( queueTab );
+    //xTaskCreate(&SP1D_Task,"SP1D tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
+    //vTaskStartScheduler();
 
     for(;;);
 }
