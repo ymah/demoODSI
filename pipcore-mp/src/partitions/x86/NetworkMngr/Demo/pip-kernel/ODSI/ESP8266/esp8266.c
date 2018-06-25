@@ -25,7 +25,7 @@ int esp8266_response_contains(const char *response, const char *contain)
 	char response_cpy[BUFFER_SIZE]; // buffer to copie the response
 	unsigned long contain_size = strlen(contain); // get the size of the wanted string
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(response_cpy, 0, sizeof(response_cpy));
 
 	// test if the size of response_cpy "BUFFER_SIZE" is bigger than the size of "contain"
@@ -66,6 +66,7 @@ void esp8266_init_reset_pin()
 void esp8266_hard_reset()
 {
 	//  Block for 500ms.
+	printf("Reset ESP8266\r\n");
 	const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
 	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, LOW);
 	vTaskDelay( xDelay );
@@ -91,7 +92,7 @@ int esp8266_send_tcp_header(int length_int)
 		return ret;
 	}
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// convert tcp paylaod length from int to string

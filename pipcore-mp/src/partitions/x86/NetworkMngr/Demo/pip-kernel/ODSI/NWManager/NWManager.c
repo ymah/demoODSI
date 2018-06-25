@@ -62,14 +62,14 @@ static uint8_t waiting_tcp_header_reception_ack = 0;
 static uint8_t v_link_is_not_valid = 0;
 static uint8_t fatal_error = 0;
 
-void NW_Task( void *pvParameters )
+void NW_Task( uint32_t *pvParameters )
 {
-	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[0];
+	QueueHandle_t xQueue_2NW = (QueueHandle_t) pvParameters[0];
 	QueueHandle_t xQueue_domains_array[4];
-	xQueue_domains_array[0] = ( (QueueHandle_t) pvParameters)[1];
-	xQueue_domains_array[1] = ( (QueueHandle_t) pvParameters)[2];
-	xQueue_domains_array[2] = ( (QueueHandle_t) pvParameters)[3];
-	xQueue_domains_array[3] = ( (QueueHandle_t) pvParameters)[4];
+	xQueue_domains_array[0] = (QueueHandle_t) pvParameters[1];
+	xQueue_domains_array[1] = (QueueHandle_t) pvParameters[2];
+	xQueue_domains_array[2] = (QueueHandle_t) pvParameters[3];
+	xQueue_domains_array[3] = (QueueHandle_t) pvParameters[4];
 
 	event_t ICEvent;
 	event_t EventRequest;
@@ -82,8 +82,7 @@ void NW_Task( void *pvParameters )
 	// init reset pin of the esp8266
 	//esp8266_init_reset_pin(); // Done by the root domain
 	// hard reset the esp8266
-	for(;;)
-		printf("Waiting for hardware\r\n");
+
 	esp8266_hard_reset();
 
 	//wait ...

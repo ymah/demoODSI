@@ -1,15 +1,13 @@
 /*
  * NWManager.h
  *
- *  Created on: 14 déc. 2017
+ *  Created on: 14 dï¿½c. 2017
  *      Author: hzgf0437
  */
 
 #ifndef NWMANAGER_NWMANAGER_H_
 #define NWMANAGER_NWMANAGER_H_
 
-void NW_Task( void *pvParameters );
+void NW_Task( uint32_t *pvParameters );
 
 #endif /* NWMANAGER_NWMANAGER_H_ */
-
-
