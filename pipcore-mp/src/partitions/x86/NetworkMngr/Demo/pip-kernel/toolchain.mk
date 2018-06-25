@@ -3,5 +3,5 @@
 CC=gcc
 LD=ld
 AS=gcc
-LIBPIP=/home/mahckr/Documents/these/odsiDEMO/livraison/demoODSI/libpip
-LIBFREERTOS=/home/mahckr/Documents/these/odsiDEMO/livraison/demoODSI/libfreertos
+LIBPIP=/home/odsi/Documents/demoODSI/libpip
+LIBFREERTOS=/home/odsi/Documents/demoODSI/libfreertos
