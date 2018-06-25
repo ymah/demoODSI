@@ -25,6 +25,10 @@
 #include "task.h"
 #include "semphr.h"
 
+#include <pip/api.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
+
 /*-----------------------------------------------------------*/
 
 void SP1D_Task( uint32_t *pvParameters )
@@ -44,18 +48,21 @@ void SP1D_Task( uint32_t *pvParameters )
 	event_t MessageToReturn;
 	incomingMessage_t Check;
 
-	char INMES[IN_MAX_MESSAGE_SIZE];
-	char OUTMES[OUT_MAX_MESSAGE_SIZE];
+	char * INMES = (char*)allocPage();
+	char * OUTMES = (char*)allocPage();
 	uint32_t sizeout;
 	uint32_t j;
 
 	/* Remove compiler warning in the case that configASSERT() is not
 	defined. */
+
 	( void ) pvParameters;
 	for( ;; )
 	{
 		/* Receive data from Network manager or from Administration Manager*/
+		printf("Receiving something ?\r\n");
 		EventPartition = myreceive(INMES, xQueue_2SP1D);
+
 
 		incomingMessagecpy(&Check, &(EventPartition.eventData.incomingMessage) );
 		DEBUG(INFO,"UserID: %lu, DeviceID: %lu, DomainID: %lu, Instruction: %lu, Command Data: %s\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);

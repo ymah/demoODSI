@@ -1,7 +1,7 @@
 /*
  * NWManager.c
  *
- *  Created on: 18 déc. 2017
+ *  Created on: 18 dï¿½c. 2017
  *      Author: HZGF0437
  */
 
@@ -66,10 +66,10 @@ void NW_Task( void *pvParameters )
 {
 	QueueHandle_t xQueue_2NW = ( (QueueHandle_t*) pvParameters)[0];
 	QueueHandle_t xQueue_domains_array[4];
-	xQueue_domains_array[0] = ( (QueueHandle_t*) pvParameters)[1];
-	xQueue_domains_array[1] = ( (QueueHandle_t*) pvParameters)[2];
-	xQueue_domains_array[2] = ( (QueueHandle_t*) pvParameters)[3];
-	xQueue_domains_array[3] = ( (QueueHandle_t*) pvParameters)[4];
+	xQueue_domains_array[0] = ( (QueueHandle_t) pvParameters)[1];
+	xQueue_domains_array[1] = ( (QueueHandle_t) pvParameters)[2];
+	xQueue_domains_array[2] = ( (QueueHandle_t) pvParameters)[3];
+	xQueue_domains_array[3] = ( (QueueHandle_t) pvParameters)[4];
 
 	event_t ICEvent;
 	event_t EventRequest;
@@ -82,6 +82,8 @@ void NW_Task( void *pvParameters )
 	// init reset pin of the esp8266
 	//esp8266_init_reset_pin(); // Done by the root domain
 	// hard reset the esp8266
+	for(;;)
+		printf("Waiting for hardware\r\n");
 	esp8266_hard_reset();
 
 	//wait ...
@@ -224,7 +226,7 @@ static void read_from_esp8266()
 {
 	char rcv_buf[100];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	int read_size = 0;
@@ -815,5 +817,3 @@ static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], even
 
 	return ret;
 }
-
-

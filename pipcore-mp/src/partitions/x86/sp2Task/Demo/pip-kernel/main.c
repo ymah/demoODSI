@@ -274,8 +274,7 @@ void queueExampleTest(uint32_t queues){
 
 void main()
 {
-  for(;;)
-    printf("Hello\r\n");
+
   pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
   //Get Bootinfo for the available memory
   parse_bootinfo(bootinfo);

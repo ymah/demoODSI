@@ -160,84 +160,7 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
 }
 
 
-struct AMessage
- {
-    char ucMessageID;
-    char ucData[ 20 ];
- } xMessage;
 
-
-struct xQueueSendParameters_s {
-  uint32_t queue;
-  uint32_t * itemToQueue;
-  uint32_t tickToWait;
-};
-typedef struct xQueueSendParameters_s xQueueSendParameters;
-
-
-
-struct xQueueReceiveParameters_s {
-  uint32_t queue;
-  uint32_t * bufferReceive;
-  uint32_t tickToWait;
-};
-typedef struct xQueueReceiveParameters_s xQueueReceiveParameters;
-
-xQueueSendParameters * sendArgs;
-xQueueReceiveParameters * recArgs;
-
-
-// we create a simple message structre, for queue send
-struct AMessage *pxMessage;
-// we create a simple message structre, for queue receive
-struct AMessage *pxReceive;
-
-
-uint32_t * queueTab;
-void queueExampleTest(uint32_t queues){
-    printf("Starting queue example test\r\n");
-  int i;
-  for( i=0;i<3;i++){
-    printf("\t\t\t\t\t%x\r\n", queueTab[i]);
-  }
-
-  for(;;){
-    for(i=0;i<3;i++){
-
-    pxMessage->ucMessageID = 0x11;
-    int i;
-    for(i=0;i<20;i++)
-      pxMessage->ucData[i] = i;
-
-      sendArgs->queue = (uint32_t) (queueTab[i]);
-      sendArgs->itemToQueue = (uint32_t) pxMessage;
-      sendArgs->tickToWait = 10;
-
-      printf("Sending to parent send command\r\n");
-      Pip_Notify(0,0x80,0x16,sendArgs);
-    }
-
-
-    for(i=0;i<10000;i++);
-
-
-    for(i=0;i<3;i++){
-      printf("Starting receiving service\r\n");
-
-      recArgs->queue = (uint32_t) (queueTab[i]);
-      recArgs->tickToWait = 10;
-      recArgs->bufferReceive = (void *) pxReceive;
-
-      Pip_Notify(0,0x80,0x17,recArgs);
-
-      printf("Go back to execution\r\n");
-      struct AMessage * message = (struct AMessage*) recArgs->bufferReceive;
-      printf("Check the content of the message %x\r\n",recArgs->bufferReceive);
-      for(i=0;i<20;i++)
-        printf("%d\r\n",pxReceive->ucData[i]);
-    }
-  }
-}
 
 
 
@@ -245,26 +168,18 @@ void main()
 {
 
 
-  for(;;)
-    printf("Network manager\r\n");
-
   parse_bootinfo((pip_fpinfo *) 0xFFFFC000);
   printf("Finished initializing somethings\r\n");
 
   	printf("Queues provided by my father \r\n");
-    queueTab = pvPortMalloc(5*sizeof(uint32_t));
+    uint32_t * queueTab = pvPortMalloc(5*sizeof(uint32_t));
     for(int i =1;i<=5;i++){
       queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(uint32_t)*i);
-
+      printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
     }
-    printf("Starting SP2 task with %x\r\n",queueTab);
+    printf("Starting Network Manager task with %x\r\n",queueTab);
 
-    xQueueSendParameters * sendArgs = (xQueueSendParameters*) allocPage(); // Queue send
-    xQueueReceiveParameters * recArgs = (xQueueReceiveParameters*) allocPage(); // queue receive
-    pxMessage = (struct AMessage*) allocPage();
-    pxReceive = (struct AMessage*) allocPage();
-    queueExampleTest(queueTab);
-	//SP2D_Task( Null );
+    NW_Task(queueTab);
     for(;;);
 }
 

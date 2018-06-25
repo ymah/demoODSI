@@ -24,6 +24,10 @@
 #include "task.h"
 #include "semphr.h"
 
+#include <pip/api.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
+
 /*-----------------------------------------------------------*/
 
 void SP2D_Task( uint32_t *pvParameters )
@@ -43,8 +47,8 @@ void SP2D_Task( uint32_t *pvParameters )
 	event_t MessageToReturn;
 	incomingMessage_t Check;
 
-	char INMES[IN_MAX_MESSAGE_SIZE];
-	char OUTMES[OUT_MAX_MESSAGE_SIZE];
+	char * INMES = (char*)allocPage();
+	char * OUTMES = (char*)allocPage();
 	uint32_t sizeout;
 	uint32_t j;
 
