@@ -5,7 +5,7 @@
 
 function updateGitFreeRTOS(){
 
-    cd src/partitions/x86/pip-freertos
+    cd pipcore-mp/src/partitions/x86/pip-freertos
 
     git pull origin master
 
@@ -16,7 +16,7 @@ function updateGitFreeRTOS(){
 
 function updateGitLibFreeRTOS(){
 
-    cd ../libfreertos/ 
+    cd libfreertos/ 
     git pull origin master
     cd -
 }
