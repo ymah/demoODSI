@@ -1,7 +1,7 @@
 /*
  * manageNW_simple.c
  *
- *  Created on: 14 déc. 2017
+ *  Created on: 14 dï¿½c. 2017
  *      Author: hzgf0437
  */
 
@@ -57,7 +57,7 @@ uint32_t iteration=0;
 // TODO use a timeout instead of indeterministic loop
 void* initialize()
 {
-        const TickType_t xDelay_2_sec = 2000 / portTICK_PERIOD_MS;
+        const TickType_t xDelay_2_sec = 2;
 	int esp8266_init_error = 0;
 
 	fifo_init(&tcp_rcv_fifo);
@@ -181,7 +181,7 @@ uint32_t ext_listen( void* LSocket){
 	/* Remove compiler warning about unused parameter. */
 	(void) LSocket;
 
-	const TickType_t xDelay_2_sec = 2000 / portTICK_PERIOD_MS;
+	const TickType_t xDelay_2_sec = 2;
 	int ret = 0;
 
 	// create TCP server at port 8080
@@ -313,9 +313,13 @@ void mycloseSocket(void* Socket){
  */
 static void esp8266_soft_restart()
 {
-	DEBUG(TRACE, "ESP8266 soft restart ...\r\n");
+	//DEBUG(TRACE, "ESP8266 soft restart ...\r\n");
+  printf("ESP8266 soft restart ...\r\n");
 	// send AT+RST
+	printf("%s\r\n",(const char *)ESP8266_AT_SOFT_RESTART);
+  vInitializeGalileo_client_SerialPort();
 	vGalileo_UART0_write((const char *)ESP8266_AT_SOFT_RESTART, strlen((const char *)ESP8266_AT_SOFT_RESTART));
+
 }
 
 /*
@@ -329,7 +333,7 @@ static int esp8266_is_ready_received()
 	int ready_received = 0;
 	char rcv_buf[10];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	while(!ready_received && vGalileo_UART0_is_data_available() )
@@ -361,18 +365,23 @@ static int esp8266_is_ready_received()
  */
 static int esp8266_restart()
 {
-        const TickType_t xDelay_2_sec = 2000 / portTICK_PERIOD_MS;
+        const TickType_t xDelay_2_sec = 20;
 	int ret = 0;
 
 	// flush all received data
+	printf("flush all received data\r\n");
 	vGalileo_UART0_flush_DMA_rcv_buffer();
 
 	// try soft restart
+
+  printf("try soft restart\r\n");
 	esp8266_soft_restart();
 
 	//wait ...
+
 	vTaskDelay( xDelay_2_sec );
 
+  printf("check if ready message received\r\n");
 	// check if ready message received
 	if(esp8266_is_ready_received()){
 		DEBUG(TRACE, "ESP8266 soft restart [OK]\r\n");
@@ -411,7 +420,7 @@ static int esp8266_wait_for_wifi_connection()
 	int unknown_msg_received = 0;
 	char rcv_buf[20];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	while(!wifi_connected && !unknown_msg_received )
@@ -450,7 +459,7 @@ static int esp8266_wait_for_ip_addr_attribution()
 	int unknown_msg_received = 0;
 	char rcv_buf[20];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	while(!wifi_got_ip && !unknown_msg_received )
@@ -480,9 +489,9 @@ static int esp8266_disable_echoing()
 {
 	int ret = 0;
 	char rcv_buf[10];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// send ATE0
@@ -503,7 +512,7 @@ static int esp8266_disable_echoing()
 	// test if we received ATE0
 	else if(esp8266_response_contains(rcv_buf, "ATE0"))
 	{
-		// mettre le buffer à zero
+		// mettre le buffer ï¿½ zero
 		memset(rcv_buf, 0, sizeof(rcv_buf));
 
 		// should receive OK this time !!!
@@ -538,8 +547,8 @@ static int esp8266_test_serial_comm()
 {
 	int ret = 0;
 	char rcv_buf[2];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// send AT
@@ -572,9 +581,9 @@ static int esp8266_disable_transparent_transmission()
 {
 	int ret = 0;
 	char rcv_buf[2];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// disable transparent transmission (mandatory to activate multiple connections)
@@ -607,9 +616,9 @@ static int esp8266_enable_multiple_connections()
 {
 	int ret = 0;
 	char rcv_buf[2];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// enable multiple connections
@@ -642,9 +651,9 @@ static int esp8266_set_maximum_connections_to_one()
 {
 	int ret = 0;
 	char rcv_buf[2];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// sets the maximum connections allowed by server to one
@@ -678,9 +687,9 @@ static int esp8266_create_tcp_server_port_8080()
 	int ret = 0;
 	char rcv_buf[20];
 
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// create TCP server at port 8080
@@ -701,7 +710,7 @@ static int esp8266_create_tcp_server_port_8080()
 	// test if we received no change
 	else if(esp8266_response_contains(rcv_buf, "no change"))
 	{
-		// mettre le buffer à zero
+		// mettre le buffer ï¿½ zero
 		memset(rcv_buf, 0, sizeof(rcv_buf));
 
 		// should receive OK this time !!!
@@ -736,10 +745,10 @@ static int esp8266_set_tcp_srv_timeout(unsigned int timeout)
 {
 	int ret = 0;
 	char rcv_buf[2];
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
+	const TickType_t xDelay_1_ms = 1;
 
-	
-	// mettre le buffer à zero
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	switch(timeout)
@@ -783,9 +792,9 @@ static int esp8266_hide_remote_IP_port_with_IPD()
 	int ret = 0;
 	char rcv_buf[2];
 
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
-	// mettre le buffer à zero
+	const TickType_t xDelay_1_ms = 1;
+
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 
 	// Hide the remote IP and Port with +IPD
@@ -845,7 +854,7 @@ static char esp8266_get_link_number()
 	char link_number = '\0';
 	char rcv_buf[2];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 	// read 2 characters "<link_number>,"
 	int read_size = vGalileo_UART0_read(rcv_buf, sizeof(rcv_buf));
@@ -878,7 +887,7 @@ static int esp8266_get_tcp_segment_payload_length()
 	int payload_length = 0;
 	char rcv_buf[5];
 
-	// mettre le buffer à zero
+	// mettre le buffer ï¿½ zero
 	memset(rcv_buf, 0, sizeof(rcv_buf));
 	// read 4 characters maximum
 	unsigned int i = 0;
@@ -963,8 +972,8 @@ int esp8266_get_tcp_payload(unsigned int payload_size)
 	unsigned int remaining_bytes = payload_size;
 	char rcv_buf[ESP8266_RCV_PAYLOAD_MAX_SIZE];
 
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
+	const TickType_t xDelay_1_ms = 1 ;
+
 	if(remaining_bytes > sizeof(rcv_buf))
 	{
 		remaining_bytes = 0;
@@ -1002,8 +1011,8 @@ static int esp8266_send_tcp_payload(char *payload, unsigned int payload_size)
 {
 	int ret = 0;
 
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	
+	const TickType_t xDelay_1_ms = 1;
+
 	// test if payload_size is less than the send max size and bigger than 0
 	if( (payload_size < 1) || (payload_size > ESP8266_SEND_BUFFER_MAX_SIZE) )
 	{

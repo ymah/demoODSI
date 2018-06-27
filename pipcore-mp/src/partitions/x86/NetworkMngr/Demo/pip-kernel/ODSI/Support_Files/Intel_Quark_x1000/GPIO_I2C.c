@@ -331,6 +331,7 @@ static uint8_t LegacyGpioGetLevel(uint32_t RegOffset, uint32_t GpioNum)
   */
   void Quark_x1000_Set_GPIO_BitLevel(uint32_t GPIONumber, uint32_t Level)
   {
+		printf("Setting GPIO %x at bit level %x ",GPIONumber,Level);
 	  /* Check Range. */
 	  if(GPIONumber <= 7)
 	  {
@@ -342,7 +343,8 @@ static uint8_t LegacyGpioGetLevel(uint32_t RegOffset, uint32_t GpioNum)
 				  GpioConfig.PortADR |= (1 << GPIONumber);
 			  else
 				  GpioConfig.PortADR &= ~(1 << GPIONumber);
-			  vGalileoGPIOWrite(GPIO_SWPORTA_DR, GpioConfig.PortADR);
+				printf("Write %x into %x\r\n",GpioConfig.PortADR,GPIO_SWPORTA_DR);
+			  vGalileoGPIOWrite(0xDEADBEEF, GpioConfig.PortADR);
 		  }
 	  }
 	  else if(GPIONumber >= 8 && GPIONumber <= 9)
@@ -825,7 +827,7 @@ void I2CWriteMultipleBytes(I2C_DEVICE_ADDRESS  SlaveAddress,
   }
   /*-----------------------------------------------------------*/
 
- // No utilisé (contains a bug!!!)
+ // No utilisï¿½ (contains a bug!!!)
  /*static void I2CReadMultipleBytes(I2C_DEVICE_ADDRESS SlaveAddress, I2C_ADDR_MODE AddrMode,
  uintn_t *WriteLength, uintn_t *ReadLength, void *Buffer )
  {
@@ -848,4 +850,3 @@ void I2CWriteMultipleBytes(I2C_DEVICE_ADDRESS  SlaveAddress,
  }*/
 
  /*-----------------------------------------------------------*/
-

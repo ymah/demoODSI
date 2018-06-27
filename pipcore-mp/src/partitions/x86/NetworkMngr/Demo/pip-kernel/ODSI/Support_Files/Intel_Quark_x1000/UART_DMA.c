@@ -50,6 +50,7 @@ int vGalileo_UART0_is_data_available()
  */
 void vGalileo_UART0_flush_DMA_rcv_buffer()
 {
+	vInitializeGalileoUART_RCVR_DMA(CLIENT_SERIAL_PORT);
 	volatile uint32_t dest_addr = 0;
 
 	dest_addr = mem_read(DMA_UART_0_MMIO_Base, R_DMA_DAR0, 4);

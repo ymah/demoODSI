@@ -67,10 +67,15 @@ void esp8266_hard_reset()
 {
 	//  Block for 500ms.
 	printf("Reset ESP8266\r\n");
-	const TickType_t xDelay = 500 / portTICK_PERIOD_MS;
+
+	const TickType_t xDelay = 500;
+	printf("Reset Low\r\n");
 	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, LOW);
 	vTaskDelay( xDelay );
+	printf("Reset high\r\n");
 	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, HIGH);
+		vTaskDelay( xDelay );
+	printf("Finished reset ESP8266\r\n");
 }
 
 /*

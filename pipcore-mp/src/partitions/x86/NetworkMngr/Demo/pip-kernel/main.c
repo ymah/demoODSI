@@ -75,7 +75,10 @@
 #include "cpuidh.h"
 
 #include "NWManager.h"
-
+#include "UART_DMA.h"
+#include "esp8266.h"
+#include "Quark_x1000_support.h"
+#include "Galileo_Gen2_Board.h"
 /*
 #include "NWManager.h"
 #include "Internal_Communication.h"
@@ -163,7 +166,6 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
 
 
 
-
 void main()
 {
 
@@ -178,6 +180,7 @@ void main()
       printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
     }
     printf("Starting Network Manager task with %x\r\n",queueTab);
+
 
     NW_Task(queueTab);
     for(;;);

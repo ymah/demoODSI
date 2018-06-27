@@ -515,8 +515,10 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
 
  void vInitializeGalileo_client_SerialPort()
  {
+
   	if( bGalileo_client_SerialPortInitialized == FALSE )
  	{
+			 printf("Initialize client serial port \r\n");
 		/* Initialise for 115200, 8, 1, none and no handshaking */
   		vInitializeGalileoUART(CLIENT_SERIAL_PORT);
 		bGalileo_client_SerialPortInitialized = TRUE;
@@ -631,10 +633,7 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
  {
 	 //if (bGalileo_client_SerialPortInitialized)
 	 //{
-		while((mem_read(UART_0_MMIO_Base, R_UART_LSR, 1) & B_UART_LSR_TXRDY) == 0)
-		{
-			;
-		}
+		while((mem_read(UART_0_MMIO_Base, R_UART_LSR, 1) & B_UART_LSR_TXRDY) == 0);
 		mem_write(UART_0_MMIO_Base, R_UART_BAUD_THR, 1, c);
 	 //}
  }
