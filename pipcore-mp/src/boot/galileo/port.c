@@ -261,7 +261,15 @@ void outaddrlGlue(uint32_t port, uint32_t value, gate_ctx_t *ctx)
 	uintptr_t idxPd = getIndexOfAddr(vad, 1);
 	uintptr_t idxPt = getIndexOfAddr(vad, 0);
 	uintptr_t pd = readPhysical(getCurPartition(), 2);
+	if(!readAccessible(pd,idxPd) || !readPresent(pd,idxPd))
+	{	DEBUG(TRACE,"Pip_OUTADDR : Forbidden access to vaddr %x\r\n",value);
+		return;
+	}
 	uintptr_t pt = readPhysical(pd, idxPd);
+	if(!readAccessible(pt,idxPt) || !readPresent(pt,idxPt))
+	{	DEBUG(TRACE,"Pip_OUTADDR : Forbidden access to vaddr %x\r\n",value);
+		return;
+	}
 	uintptr_t pad = readPhysical(pt, idxPt) | offset;
 
 	if (!ioAccessValid(port))
