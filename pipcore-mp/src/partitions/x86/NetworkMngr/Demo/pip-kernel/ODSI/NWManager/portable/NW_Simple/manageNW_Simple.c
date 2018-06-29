@@ -496,7 +496,7 @@ static int esp8266_disable_echoing()
 
 	// send ATE0
 	vGalileo_UART0_write((const char *)ESP8266_AT_DISABLE_ECHOING, strlen((const char *)ESP8266_AT_DISABLE_ECHOING));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive ATE0 unless echoing is already disabled
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -553,7 +553,7 @@ static int esp8266_test_serial_comm()
 
 	// send AT
 	vGalileo_UART0_write((const char *)ESP8266_AT_TEST_COMM, strlen((const char *)ESP8266_AT_TEST_COMM));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -588,7 +588,7 @@ static int esp8266_disable_transparent_transmission()
 
 	// disable transparent transmission (mandatory to activate multiple connections)
 	vGalileo_UART0_write((const char *)ESP8266_AT_DISABLE_TRANSPARENT_TRANS, strlen((const char *)ESP8266_AT_DISABLE_TRANSPARENT_TRANS));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -623,7 +623,7 @@ static int esp8266_enable_multiple_connections()
 
 	// enable multiple connections
 	vGalileo_UART0_write((const char *)ESP8266_AT_ENABLE_MULTI_CONN, strlen((const char *)ESP8266_AT_ENABLE_MULTI_CONN));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -658,7 +658,7 @@ static int esp8266_set_maximum_connections_to_one()
 
 	// sets the maximum connections allowed by server to one
 	vGalileo_UART0_write((const char *)ESP8266_AT_SET_MAX_CONN_TO_ONE, strlen((const char *)ESP8266_AT_SET_MAX_CONN_TO_ONE));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -694,7 +694,7 @@ static int esp8266_create_tcp_server_port_8080()
 
 	// create TCP server at port 8080
 	vGalileo_UART0_write((const char *)ESP8266_AT_CREATE_TCP_SRV_PORT_8080, strlen((const char *)ESP8266_AT_CREATE_TCP_SRV_PORT_8080));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK unless tcp server is already activated
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -763,7 +763,7 @@ static int esp8266_set_tcp_srv_timeout(unsigned int timeout)
 		vGalileo_UART0_write((const char *)ESP8266_AT_SET_TCP_SRV_TIMEOUT_180, strlen((const char *)ESP8266_AT_SET_TCP_SRV_TIMEOUT_180));
 		break;
 	}
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -799,7 +799,7 @@ static int esp8266_hide_remote_IP_port_with_IPD()
 
 	// Hide the remote IP and Port with +IPD
 	vGalileo_UART0_write((const char *)ESP8266_AT_HIDE_REMOTE_IP_PORT, strlen((const char *)ESP8266_AT_HIDE_REMOTE_IP_PORT));
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	// should receive OK
 	while(vGalileo_UART0_read_line(rcv_buf, sizeof(rcv_buf)) == 0 && vGalileo_UART0_is_data_available())
@@ -991,7 +991,7 @@ int esp8266_get_tcp_payload(unsigned int payload_size)
 			while(!fifo_push(&tcp_rcv_fifo, rcv_buf, read_size))
 			{
 				DEBUG(CRITICAL, "tcp rcv FIFO overflow\r\n");
-				vTaskDelay(xDelay_1_ms);
+				vTaskDelay_ms(xDelay_1_ms);
 			}
 
 			// update remaining bytes to get
@@ -1021,7 +1021,7 @@ static int esp8266_send_tcp_payload(char *payload, unsigned int payload_size)
 
 	// send the payload
 	vGalileo_UART0_write(payload, payload_size);
-	vTaskDelay( xDelay_1_ms );
+	vTaskDelay_ms( xDelay_1_ms );
 
 	ret = 1;
 

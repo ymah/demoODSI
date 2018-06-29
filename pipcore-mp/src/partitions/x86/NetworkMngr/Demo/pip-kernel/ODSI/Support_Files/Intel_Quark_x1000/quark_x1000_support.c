@@ -548,13 +548,13 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
  {
 	unsigned long i = 0;
 
-	if (semUART0Gate == 0)
+	/*if (semUART0Gate == 0)
 	{
 		vCreate_UART0_Semaphore();
-	}
+	}*/
 
-	if (xSemaphoreTakeRecursive(semUART0Gate, MUTEX_WAIT_TIME ))
-	{
+	/*if (xSemaphoreTakeRecursive(semUART0Gate, MUTEX_WAIT_TIME ))
+	{*/
 		if (bGalileo_client_SerialPortInitialized)
 		{
 			for(i = 0; i < size; i++)
@@ -562,8 +562,8 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
 				buf[i] = uart0_dma_buffer_read_8();
 			}
 		}
-		xSemaphoreGiveRecursive(semUART0Gate);
-	}
+		/*xSemaphoreGiveRecursive(semUART0Gate);
+	}*/
 
 	return i;
  }
@@ -576,13 +576,12 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
  {
 	unsigned long i = 0;
 
-	if (semUART0Gate == 0)
+	/*if (semUART0Gate == 0)
 	{
 		vCreate_UART0_Semaphore();
-	}
-
-	if (xSemaphoreTakeRecursive(semUART0Gate, MUTEX_WAIT_TIME ))
-	{
+	}*/
+	/*if (xSemaphoreTakeRecursive(semUART0Gate, MUTEX_WAIT_TIME ))
+	{*/
 		if (bGalileo_client_SerialPortInitialized)
 		{
 			for(i = 0; i < max_size; i++)
@@ -595,8 +594,11 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
 				buf[i] = c;
 			}
 		}
-		xSemaphoreGiveRecursive(semUART0Gate);
-	}
+		/*xSemaphoreGiveRecursive(semUART0Gate);
+	}*/
+
+	buf[max_size-1] = '\0';
+	printf("%s\r\n", buf);
 
 	return i;
  }

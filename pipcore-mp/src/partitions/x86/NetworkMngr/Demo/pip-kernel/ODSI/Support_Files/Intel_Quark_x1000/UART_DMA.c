@@ -13,7 +13,7 @@
 
 #define BUFFER_SIZE		4095
 
-static char dma_buffer[BUFFER_SIZE];
+static uint8_t *dma_buffer;
 
 static uint32_t bGalileo_UART0_DMAC_Initialized = FALSE;
 //static uint32_t bGalileo_UART1_DMAC_Initialized = FALSE;
@@ -25,6 +25,11 @@ static void vInitializeGalileoUART_RCVR_DMA(uint32_t portnumber);
 
 static uint32_t buffer_index = 0;
 
+void set_dma_buffer(uint32_t dma_buffer_addr)
+{
+	dma_buffer = dma_buffer_addr;
+}
+
 /*
  * Use DMA
  * returns 1 if their is data available to be read
@@ -35,7 +40,9 @@ int vGalileo_UART0_is_data_available()
 	int ret = 0;
 
 	dest_addr = mem_read(DMA_UART_0_MMIO_Base, R_DMA_DAR0, 4);
-
+	printf("Dest_addr\t\t\t\t\t%x\r\n", dest_addr);
+	printf("DMA_buffer\t\t\t\t\t%x\r\n", dma_buffer);
+	printf("Buffer_index\t\t\t\t\t%x\r\n", buffer_index);
 	// checks if the dest_addr changed
 	if((dest_addr - (uint32_t)dma_buffer) != buffer_index)
 	{
@@ -50,7 +57,6 @@ int vGalileo_UART0_is_data_available()
  */
 void vGalileo_UART0_flush_DMA_rcv_buffer()
 {
-	vInitializeGalileoUART_RCVR_DMA(CLIENT_SERIAL_PORT);
 	volatile uint32_t dest_addr = 0;
 
 	dest_addr = mem_read(DMA_UART_0_MMIO_Base, R_DMA_DAR0, 4);
@@ -68,7 +74,7 @@ char uart0_dma_buffer_read_8()
 	char data_8 = 0;
 
 	/* Block for 1ms. */
-	const TickType_t xDelay = 1 / portTICK_PERIOD_MS;
+	const TickType_t xDelay = 1;
 
 	dest_addr = mem_read(DMA_UART_0_MMIO_Base, R_DMA_DAR0, 4);
 
@@ -79,14 +85,15 @@ char uart0_dma_buffer_read_8()
 	}
 
 	// there is something to read
-	vTaskDelay( xDelay );
+	vTaskDelay_ms( xDelay );
 	data_8 = dma_buffer[buffer_index];
 	buffer_index++;
-	if(buffer_index >= sizeof(dma_buffer))
+	if(buffer_index >= BUFFER_SIZE)
 	{
 		buffer_index = 0;
 	}
 
+	printf("%x\r\n", data_8);
 
 	return data_8;
 }
@@ -103,7 +110,7 @@ char uart0_dma_buffer_read_8()
 
 	dma_buffer[buffer_index] = 0;
 	buffer_index++;
-	if(buffer_index >= sizeof(dma_buffer))
+	if(buffer_index >= BUFFER_SIZE)
 	{
 		buffer_index = 0;
 	}
@@ -162,64 +169,4 @@ static void vInitializeGalileoUART_RCVR_DMA(uint32_t portnumber)
 		DMA_UART_0_MMIO_Base = bar1;
 	}
 
-
-	memset(dma_buffer, 0, 4096);
-
-	// Disable channel
-	input_data = mem_read(bar1, R_DMA_CH_EN_REG, 4);
-	input_data &= ~MASK_DMA_CH_EN_REG;
-	//input_data |= R_DMA_CH_EN_REG_CH_EN;
-	input_data |= R_DMA_CH_EN_REG_CH_EN_WE;
-	mem_write(bar1, R_DMA_CH_EN_REG, 4, input_data);
-
-
-	//mem_write(bar1, R_DMA_CFG_REG, 1, (uint8_t)(~B_DMA_CFG_REG_DMA_EN));
-	mem_write(bar1, R_DMA_CFG_REG, 1, (uint8_t)B_DMA_CFG_REG_DMA_EN);
-
-
-	//src_dma_test = 'H';
-	mem_write(bar1, R_DMA_SAR0, 4, B_DMA_SAR0_SAR_RBR); // &src_dma_test);0
-
-	mem_write(bar1, R_DMA_DAR0, 4, dma_buffer);
-
-	input_data = mem_read(bar1, R_DMA_CTL0_L, 4);
-	input_data &= ~MASK_DMA_CTL0_L;
-	input_data |= B_DMA_CTL0_L_INT_EN;
-	input_data |= B_DMA_CTL0_L_DST_TR_WIDTH_8;
-	input_data |= B_DMA_CTL0_L_SRC_TR_WIDTH_8;
-	input_data |= B_DMA_CTL0_L_DINC_INC;
-	input_data |= B_DMA_CTL0_L_SINC_NOCHANGE;
-	input_data |= B_DMA_CTL0_L_DEST_MSIZE_1;
-	input_data |= B_DMA_CTL0_L_SRC_MSIZE_1;
-	input_data |= B_DMA_CTL0_L_TT_FC;
-	mem_write(bar1, R_DMA_CTL0_L, 4, input_data);
-
-	input_data = mem_read(bar1, R_DMA_CTL0_U, 4);
-	input_data &= ~MASK_DMA_CTL0_U;
-	input_data |= B_DMA_CTL0_U_BLOCK_TS;
-	mem_write(bar1, R_DMA_CTL0_U, 4, input_data);
-
-	input_data = mem_read(bar1, R_DMA_CFG0_L, 4);
-	input_data &= ~MASK_DMA_CFG0_L;
-	input_data |= B_DMA_CFG0_L_CH_PRIOR;
-	input_data |= B_DMA_CFG0_L_HS_SEL_SRC;
-	input_data |= B_DMA_CFG0_L_DST_HS_POL_LOW;
-	input_data |= B_DMA_CFG0_L_SRC_HS_POL_LOW;
-	input_data |= B_DMA_CFG0_L_RELOAD_SRC;
-	input_data |= B_DMA_CFG0_L_RELOAD_DST;
-	mem_write(bar1, R_DMA_CFG0_L, 4, input_data);
-
-	input_data = mem_read(bar1, R_DMA_CFG0_U, 4);
-	input_data &= ~MASK_DMA_CFG0_U;
-	input_data |= B_DMA_CFG0_U_SRC_PER;
-	input_data |= B_DMA_CFG0_U_DEST_PER;
-	mem_write(bar1, R_DMA_CFG0_U, 4, input_data);
-
-	//mem_write(bar1, R_DMA_CFG_REG, 1, (uint8_t)B_DMA_CFG_REG_DMA_EN);
-
-	input_data = mem_read(bar1, R_DMA_CH_EN_REG, 4);
-	input_data &= ~MASK_DMA_CH_EN_REG;
-	input_data |= R_DMA_CH_EN_REG_CH_EN;
-	input_data |= R_DMA_CH_EN_REG_CH_EN_WE;
-	mem_write(bar1, R_DMA_CH_EN_REG, 4, input_data);
  }

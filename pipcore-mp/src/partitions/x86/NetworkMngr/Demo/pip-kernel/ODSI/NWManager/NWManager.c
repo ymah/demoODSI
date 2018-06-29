@@ -63,65 +63,6 @@ static uint8_t waiting_tcp_header_reception_ack = 0;
 static uint8_t v_link_is_not_valid = 0;
 static uint8_t fatal_error = 0;
 
-
-
-void prvSetupHardware( void )
-{
-	// initialize debug serial port (UART1)
-	printf("initialize debug serial port (UART1)\r\n");
-	vInitializeGalileo_debug_SerialPort();
-
-	// initialize client serial port (UART0)
-	vInitializeGalileo_client_SerialPort();
-	// initialize DMAC for client serial port for receiving
-	printf("initialize DMAC for client serial port for receiving\r\n");
-	vInitializeGalileo_client_SerialPort_RCVR_DMA();
-
-	/*
-	 * initialize GPIO controller
-	 *
-	 * GPIO<0> to GPIO<7>
-	 */
-	 printf("initialize GPIO controller\r\n");
-	vGalileoInitializeGpioController();
-
-	/*
-	 * initialize GPIO Legacy
-	 *
-	 * GPIO<8> and GPIO<9>  (Core Well)
-	 * and GPIO_SUS<0> to GPIO_SUS<5> (Resume Well)
-	 */
-	 printf("initialize GPIO Legacy\r\n");
-	vGalileoInitializeLegacyGPIO();
-
-	/*
-	 * initialize IO 7 and IO 8
-	 * they are not connected to Quark SoC directly
-	 * instead they are connected to Expander 1 embedded on the Galileo Board
-	 */
-	 printf("initialize IO 7 and IO 8\r\n");
-	Galileo_Gen2_Init_IO7_and_IO8();
-
-	/* Route Intel Galileo Board IOs (GPIO, UART, ... to IO header) */
-	printf("Route Intel Galileo Board IOs (GPIO, UART, ... to IO header)\r\n");
-	vGalileoRoute_IOs();
-
-	/*
-	 * init ESP8266 reset pin
-	 * set pin as output and deactivate reset
-	 */
-	 printf("init ESP8266 reset pin\r\n");
-	Galileo_Gen2_Set_IO_Direction(ESP8266_HARD_RESET_PIN, GPIO_OUTPUT);
-	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, HIGH);
-	printf("Hardware set up\r\n");
-
-}
-
-
-
-
-
-
 void NW_Task( uint32_t *pvParameters )
 {
 	QueueHandle_t xQueue_2NW = (QueueHandle_t) pvParameters[0];
@@ -143,7 +84,6 @@ void NW_Task( uint32_t *pvParameters )
 	//esp8266_init_reset_pin(); // Done by the root domain
 	// hard reset the esp8266
 
-	prvSetupHardware();
 	esp8266_hard_reset();
 	printf("Go back to Network Task\r\n");
 	//wait ...

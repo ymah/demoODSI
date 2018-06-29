@@ -310,6 +310,8 @@ void main()
       queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
       printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
     }
+
+
     printf("Starting OD task with %x\r\n",queueTab);
 
   //od_Task2( 0xDEADBEEF );

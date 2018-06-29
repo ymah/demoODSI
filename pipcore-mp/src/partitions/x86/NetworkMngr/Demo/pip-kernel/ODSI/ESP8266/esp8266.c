@@ -71,10 +71,10 @@ void esp8266_hard_reset()
 	const TickType_t xDelay = 500;
 	printf("Reset Low\r\n");
 	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, LOW);
-	vTaskDelay( xDelay );
+	vTaskDelay_ms( xDelay );
 	printf("Reset high\r\n");
 	Galileo_Gen2_Set_IO_Level(ESP8266_HARD_RESET_PIN, HIGH);
-		vTaskDelay( xDelay );
+	vTaskDelay_ms( xDelay );
 	printf("Finished reset ESP8266\r\n");
 }
 
@@ -110,8 +110,8 @@ int esp8266_send_tcp_header(int length_int)
 	vGalileo_UART0_write(header_string, strlen(header_string));
 	vGalileo_UART0_write("\r\n", 2);
 
-	const TickType_t xDelay_1_ms = 1 / portTICK_PERIOD_MS;
-	vTaskDelay( xDelay_1_ms );
+	const TickType_t xDelay_1_ms = 1;
+	vTaskDelay_ms( xDelay_1_ms );
 
 	ret = 1;
 

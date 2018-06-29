@@ -57,4 +57,6 @@ void client_SerialPort_RCVR_DMA_disable();
 int vGalileo_UART0_is_data_available();
 void vGalileo_UART0_flush_DMA_rcv_buffer();
 
+void set_dma_buffer(uint32_t dma_buffer_addr);
+
 char uart0_dma_buffer_read_8();
