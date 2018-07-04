@@ -28,6 +28,11 @@
 #include "task.h"
 #include "semphr.h"
 
+#include <pip/fpinfo.h>
+#include <pip/debug.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
+
 // static function prototypes
 static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], event_t *p_EventRequest, uint32_t size_in);
 static int rcv_tcp_segment(char *rcv_buf);
@@ -72,8 +77,10 @@ void NW_Task( uint32_t *pvParameters )
 	xQueue_domains_array[2] = (QueueHandle_t) pvParameters[3];
 	xQueue_domains_array[3] = (QueueHandle_t) pvParameters[4];
 
-	event_t ICEvent;
-	event_t EventRequest;
+	event_t *ICEvent = (event_t *) allocPage;
+	printf("ICEvent : %x\r\n", ICEvent);
+	event_t *EventRequest = (event_t *) allocPage;
+	printf("EventRequest : %x\r\n", EventRequest);
 
 	uint32_t size_in = 0, sizeout = 0;
 
@@ -124,13 +131,14 @@ void NW_Task( uint32_t *pvParameters )
 			 */
 			//memset(InValue, 0, IN_MAX_MESSAGE_SIZE*sizeof(char));
 			// TODO remove the IN_MAX_MESSAGE_SIZE bytes receive limit using receive FIFO
-			size_in = ext_receive(ClientSocket, EventRequest.eventData.nw.stream);
+			size_in = ext_receive(ClientSocket, EventRequest->eventData.nw.stream);
 			if(size_in > 0)
 			{
-				EventRequest.eventType = NW_IN;
-				EventRequest.eventData.nw.size=size_in;
+				EventRequest->eventType = NW_IN;
+				EventRequest->eventData.nw.size=size_in;
 				// dispatch
-				dispatch_message_to_domain(xQueue_domains_array, &EventRequest, size_in);
+				printf("[Network Manager] dispatch_message_to_domain\r\n");
+				dispatch_message_to_domain(xQueue_domains_array, EventRequest, size_in);
 			}
 
 			/*
@@ -140,11 +148,13 @@ void NW_Task( uint32_t *pvParameters )
 			{
 				/* Receive Response data
 				 * Don't block if nothing to read. */
-				if( xQueueReceive( xQueue_2NW, &ICEvent, ( TickType_t ) 0 ) )
+				printf("[Network Manager] xQueueReceive( xQueue_2NW, ICEvent...\r\n");
+				if( xQueueReceive( xQueue_2NW, ICEvent, ( TickType_t ) 0 ) )
 				{
-					if(ICEvent.eventType == NW_OUT)
+					if(ICEvent->eventType == NW_OUT)
 					{
-						ext_send(ClientSocket, ICEvent.eventData.nw.stream, ICEvent.eventData.nw.size);
+						printf("[Network Manager] ext_send(...\r\n");
+						ext_send(ClientSocket, ICEvent->eventData.nw.stream, ICEvent->eventData.nw.size);
 					}
 				}
 			}
@@ -152,6 +162,7 @@ void NW_Task( uint32_t *pvParameters )
 			/*
 			 * send tcp header if any
 			 */
+			printf("[Network Manager] send tcp header if any\r\n");
 			if(		client_connected && wifi_connected && wifi_got_ip &&
 					!sending_tcp_payload  && !waiting_tcp_header_reception_ack)
 			{
