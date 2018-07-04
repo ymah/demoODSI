@@ -174,14 +174,16 @@ void main()
 	printf("Finished initializing somethings\r\n");
 
 	printf("Queues provided by my father \r\n");
-	uint32_t * queueTab = pvPortMalloc(6*sizeof(uint32_t));
-	for(int i =1;i<=6;i++){
+	uint32_t * queueTab = pvPortMalloc(7*sizeof(uint32_t));
+	for(int i =1; i<=7; i++){
 	  queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(uint32_t)*i);
 	  printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
 	}
+
 	printf("Starting Network Manager task with %x\r\n",queueTab);
 
 	set_dma_buffer(queueTab[5]);
+	set_v_dma_buffer(queueTab[6]);
 	vInitializeGalileo_client_SerialPort_RCVR_DMA();
 
 	NW_Task(queueTab);

@@ -14,6 +14,7 @@
 #define BUFFER_SIZE		4095
 
 static uint8_t *dma_buffer;
+static uint8_t *vDma_buffer;
 
 static uint32_t bGalileo_UART0_DMAC_Initialized = FALSE;
 //static uint32_t bGalileo_UART1_DMAC_Initialized = FALSE;
@@ -28,6 +29,11 @@ static uint32_t buffer_index = 0;
 void set_dma_buffer(uint32_t dma_buffer_addr)
 {
 	dma_buffer = dma_buffer_addr;
+}
+
+void set_v_dma_buffer(uint32_t v_dma_buffer_addr)
+{
+	vDma_buffer = v_dma_buffer_addr;
 }
 
 /*
@@ -74,7 +80,7 @@ char uart0_dma_buffer_read_8()
 	char data_8 = 0;
 
 	/* Block for 1ms. */
-	const TickType_t xDelay = 1;
+	const TickType_t xDelay = 100;
 
 	dest_addr = mem_read(DMA_UART_0_MMIO_Base, R_DMA_DAR0, 4);
 
@@ -86,14 +92,14 @@ char uart0_dma_buffer_read_8()
 
 	// there is something to read
 	vTaskDelay_ms( xDelay );
-	data_8 = dma_buffer[buffer_index];
+	data_8 = vDma_buffer[buffer_index];
 	buffer_index++;
 	if(buffer_index >= BUFFER_SIZE)
 	{
 		buffer_index = 0;
 	}
 
-	printf("%x\r\n", data_8);
+	printf("%x\t%c\r\n", data_8, data_8);
 
 	return data_8;
 }

@@ -597,9 +597,6 @@ void show_kernel_parameters( unsigned long magic, unsigned long addr )
 		/*xSemaphoreGiveRecursive(semUART0Gate);
 	}*/
 
-	buf[max_size-1] = '\0';
-	printf("%s\r\n", buf);
-
 	return i;
  }
 

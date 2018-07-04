@@ -365,7 +365,7 @@ static int esp8266_is_ready_received()
  */
 static int esp8266_restart()
 {
-        const TickType_t xDelay_2_sec = 20;
+        const TickType_t xDelay_2_sec = 2;
 	int ret = 0;
 
 	// flush all received data
