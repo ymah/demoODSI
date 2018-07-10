@@ -168,10 +168,14 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
 
 void main()
 {
+	pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
 
-
-	parse_bootinfo((pip_fpinfo *) 0xFFFFC000);
+	//Get Bootinfo for the available memory
+	parse_bootinfo(bootinfo);
 	printf("Finished initializing somethings\r\n");
+
+	//Initialize the avaible pages
+	uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
 
 	printf("Queues provided by my father \r\n");
 	uint32_t * queueTab = pvPortMalloc(7*sizeof(uint32_t));

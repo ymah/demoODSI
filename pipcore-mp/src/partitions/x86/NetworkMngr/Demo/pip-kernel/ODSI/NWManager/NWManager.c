@@ -77,9 +77,10 @@ void NW_Task( uint32_t *pvParameters )
 	xQueue_domains_array[2] = (QueueHandle_t) pvParameters[3];
 	xQueue_domains_array[3] = (QueueHandle_t) pvParameters[4];
 
-	event_t *ICEvent = (event_t *) allocPage;
+	event_t *ICEvent = (event_t *) allocPage();
+	event_t *EventRequest = (event_t *) allocPage();
+
 	printf("ICEvent : %x\r\n", ICEvent);
-	event_t *EventRequest = (event_t *) allocPage;
 	printf("EventRequest : %x\r\n", EventRequest);
 
 	uint32_t size_in = 0, sizeout = 0;
