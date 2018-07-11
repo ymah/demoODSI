@@ -27,6 +27,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "queueGlue.h"
 
 #include <pip/fpinfo.h>
 #include <pip/debug.h>
@@ -150,7 +151,7 @@ void NW_Task( uint32_t *pvParameters )
 				/* Receive Response data
 				 * Don't block if nothing to read. */
 				printf("[Network Manager] xQueueReceive( xQueue_2NW, ICEvent...\r\n");
-				if( xQueueReceive( xQueue_2NW, ICEvent, ( TickType_t ) 0 ) )
+				if( xProtectedQueueReceive( xQueue_2NW, ICEvent, ( TickType_t ) 0 ) )
 				{
 					if(ICEvent->eventType == NW_OUT)
 					{
