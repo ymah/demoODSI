@@ -956,7 +956,8 @@ unsigned int esp8266_get_tcp_header(char *header)
 	// get tcp segment payload length
 	payload_size = esp8266_get_tcp_segment_payload_length();
 
-	DEBUG(TRACE, "tcp segment payload length : %u\r\n", payload_size);
+	printf("tcp segment payload length : %d\r\n", 10);
+	printf("tcp segment payload length : %d\r\n", payload_size);
 
 	return payload_size;
 }

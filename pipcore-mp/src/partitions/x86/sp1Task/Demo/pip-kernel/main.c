@@ -63,7 +63,7 @@
 #include "IntQueue.h"
 #include "service.h"
 #include "queue.h"
-
+#include "queueGlue.h"
 
 #include "task.h"
 #include <pip/fpinfo.h>
@@ -188,84 +188,11 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
 }
 
 
-struct AMessage
- {
-    char ucMessageID;
-    char ucData[ 20 ];
- } xMessage;
 
 
-struct xQueueSendParameters_s {
-  uint32_t queue;
-  uint32_t * itemToQueue;
-  uint32_t tickToWait;
-};
-typedef struct xQueueSendParameters_s xQueueSendParameters;
-
-
-
-struct xQueueReceiveParameters_s {
-  uint32_t queue;
-  uint32_t * bufferReceive;
-  uint32_t tickToWait;
-};
-typedef struct xQueueReceiveParameters_s xQueueReceiveParameters;
-
-xQueueSendParameters * sendArgs;
-xQueueReceiveParameters * recArgs;
-
-
-// we create a simple message structre, for queue send
-struct AMessage *pxMessage;
-// we create a simple message structre, for queue receive
-struct AMessage *pxReceive;
 
 
 uint32_t * queueTab;
-void queueExampleTest(uint32_t queues){
-    printf("Starting queue example test\r\n");
-  int i;
-  for( i=0;i<3;i++){
-    printf("\t\t\t\t\t%x\r\n", queueTab[i]);
-  }
-
-  for(;;){
-    for(i=0;i<3;i++){
-
-    pxMessage->ucMessageID = 0x11;
-    int i;
-    for(i=0;i<20;i++)
-      pxMessage->ucData[i] = i;
-
-      sendArgs->queue = (uint32_t) (queueTab[i]);
-      sendArgs->itemToQueue = (uint32_t) pxMessage;
-      sendArgs->tickToWait = 10;
-
-      printf("Sending to parent send command\r\n");
-      Pip_Notify(0,0x80,0x16,sendArgs);
-    }
-
-
-    for(i=0;i<10000;i++);
-
-
-    for(i=0;i<3;i++){
-      printf("Starting receiving service\r\n");
-
-      recArgs->queue = (uint32_t) (queueTab[i]);
-      recArgs->tickToWait = 10;
-      recArgs->bufferReceive = (void *) pxReceive;
-
-      Pip_Notify(0,0x80,0x17,recArgs);
-
-      printf("Go back to execution\r\n");
-      struct AMessage * message = (struct AMessage*) recArgs->bufferReceive;
-      printf("Check the content of the message %x\r\n",recArgs->bufferReceive);
-      for(i=0;i<20;i++)
-        printf("%d\r\n",pxReceive->ucData[i]);
-    }
-  }
-}
 
 
 
@@ -276,6 +203,8 @@ void main()
   //Get Bootinfo for the available memory
   parse_bootinfo(bootinfo);
   initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+  initQueueService();
+
   printf("Finished initializing somethings\r\n");
 
 

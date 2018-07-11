@@ -63,7 +63,7 @@
 #include "IntQueue.h"
 #include "service.h"
 #include "queue.h"
-
+#include "queueGlue.h"
 
 #include "task.h"
 #include <pip/fpinfo.h>
@@ -301,6 +301,8 @@ void main()
   //Get Bootinfo for the available memory
 	parse_bootinfo(bootinfo);
   initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+  initQueueService();
+
   printf("Finished initializing somethings\r\n");
 
 

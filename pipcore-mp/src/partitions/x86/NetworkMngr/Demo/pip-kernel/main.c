@@ -63,7 +63,7 @@
 #include "IntQueue.h"
 #include "service.h"
 #include "queue.h"
-
+#include "queueGlue.h"
 
 #include "task.h"
 #include <pip/fpinfo.h>
@@ -176,6 +176,7 @@ void main()
 
 	//Initialize the avaible pages
 	uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+	initQueueService();
 
 	printf("Queues provided by my father \r\n");
 	uint32_t * queueTab = pvPortMalloc(7*sizeof(uint32_t));
