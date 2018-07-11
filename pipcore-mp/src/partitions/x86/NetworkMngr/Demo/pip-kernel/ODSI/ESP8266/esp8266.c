@@ -42,7 +42,7 @@ int esp8266_response_contains(const char *response, const char *contain)
 		response_cpy[contain_size] = '\0';
 		// test if response contains contain
 
-		printf("[Network Manager][response contains] %s %d\r\n", response_cpy, contain_size);
+		printf("[response contains] %s %d\r\n", response_cpy, contain_size);
 
 		if(memcmp(response_cpy, contain, contain_size) == 0)
 		{

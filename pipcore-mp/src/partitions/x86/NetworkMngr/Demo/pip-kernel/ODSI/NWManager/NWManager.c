@@ -151,7 +151,7 @@ void NW_Task( uint32_t *pvParameters )
 				/* Receive Response data
 				 * Don't block if nothing to read. */
 				printf("[Network Manager] xQueueReceive( xQueue_2NW, ICEvent...\r\n");
-				if( xProtectedQueueReceive( xQueue_2NW, ICEvent, ( TickType_t ) 0 ) )
+				if( xProtectedQueueReceive( (uint32_t)xQueue_2NW, (uint32_t)ICEvent, ( TickType_t ) 0 ) )
 				{
 					if(ICEvent->eventType == NW_OUT)
 					{

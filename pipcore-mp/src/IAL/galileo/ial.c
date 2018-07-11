@@ -559,7 +559,7 @@ dispatch2 (uint32_t partition, uint32_t vint,
 		activate(readPhysicalNoFlags(partition, indexPD () + 1));
 
 	/* Switch execution to userland */
-	IAL_DEBUG(WARNING,"switch execution to %x\r\n",partition);
+	//IAL_DEBUG(WARNING,"switch execution to %x\r\n",partition);
 	extern void dispatchAsm(uintptr_t eip, uintptr_t esp, uint32_t data1,
 							uint32_t data2, uint32_t caller);
 	dispatchAsm (eip, esp, data1, data2, caller);

@@ -443,6 +443,8 @@ static int esp8266_wait_for_wifi_connection()
 		}
 	}
 
+  printf("Finished wait for wifi connection\r\n");
+
 	return wifi_connected;
 }
 

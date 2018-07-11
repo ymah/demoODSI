@@ -503,5 +503,6 @@ void initMmu()
 			mapPageWrapper(kernelDirectory,(uint32_t)(0x90000000+index),(uint32_t)(0x90000000+index),1);
 	}
 
+
 	activate((uint32_t)kernelDirectory);
 }
