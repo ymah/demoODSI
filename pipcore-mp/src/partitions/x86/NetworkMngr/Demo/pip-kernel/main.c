@@ -70,6 +70,7 @@
 #include <pip/debug.h>
 #include <pip/paging.h>
 #include <pip/compat.h>
+#include <queueGlue.h>
 #include "dhry.h"
 #include "aes.h"
 #include "cpuidh.h"
@@ -176,7 +177,7 @@ void main()
 
 	//Initialize the avaible pages
 	uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
-
+  initQueueService();
 	printf("Queues provided by my father \r\n");
 	uint32_t * queueTab = pvPortMalloc(7*sizeof(uint32_t));
 	for(int i =1; i<=7; i++){
