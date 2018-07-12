@@ -57,6 +57,8 @@ int fifo_push(fifo_t *fifo, char *data, uint32_t size_to_push)
 
 	ret = 1;
 
+	printf("just before return from fifo_push\r\n");
+
 	return ret;
 }
 

@@ -1,7 +1,7 @@
 /*
  * parser.c
  *
- *  Created on: 14 déc. 2017
+ *  Created on: 14 dï¿½c. 2017
  *      Author: hzgf0437
  */
 
@@ -14,6 +14,11 @@
 #include "parser.h"
 #include "ResponseCode.h"
 #include <stdarg.h>
+
+#include <pip/fpinfo.h>
+#include <pip/debug.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
 
 uint32_t myhtonl(uint32_t hostlong){
 	return hostlong;
@@ -125,63 +130,83 @@ uint32_t serialize_response(response_t response, char* data){
 
 incomingMessage_t deserialize_incomingMessage(char* data, uint32_t size_total){
 
-	incomingMessage_t message;
+	incomingMessage_t *message = allocPage();
+
+	if(message == NULL)
+	{
+		printf("AllocPage failed !!!\r\n");
+	}
 
 	uint32_t size_data;
 
-	incomingMessagereset(&message);
+	incomingMessagereset(message);
 
 	uint32_t ID;
 
 	if( size_total < IN_MAX_MESSAGE_SIZE){
 		DEBUG(TRACE,"Deserializing message\r\n");
 		mymemcpy(&ID, data, sizeof(ID));
-		message.userID=myntohl(ID);
-		message.command.userID=myntohl(ID);
+		message->userID=myntohl(ID);
+		message->command.userID=myntohl(ID);
+		data += sizeof(ID);
+
+		printf("deserialise deviceId\r\n");
+
+		mymemcpy(&ID, data, sizeof(ID));
+		message->deviceID=myntohl(ID);
 		data += sizeof(ID);
 
 		mymemcpy(&ID, data, sizeof(ID));
-		message.deviceID=myntohl(ID);
+		message->domainID=myntohl(ID);
 		data += sizeof(ID);
 
 		mymemcpy(&ID, data, sizeof(ID));
-		message.domainID=myntohl(ID);
-		data += sizeof(ID);
-
-		mymemcpy(&ID, data, sizeof(ID));
-		message.command.instruction=myntohl(ID);
+		message->command.instruction=myntohl(ID);
 		data += sizeof(ID);
 
 		mymemcpy(&ID, data, sizeof(ID));
 		size_data=myntohl(ID);
 		data += sizeof(ID);
 
-		if(size_data > sizeof(message.command.data))
+		if(size_data > sizeof(message->command.data))
 		{
-			size_data = sizeof(message.command.data);
+			size_data = sizeof(message->command.data);
 			DEBUG(INFO,"[Parser] [ERROR] data size bigger than buffer size. Ignored extra data.\r\n");
 		}
 
-		mymemcpy(message.command.data, data, size_data);
+		printf("deserialise data\r\n");
+
+		mymemcpy(message->command.data, data, size_data);
 		data += size_data;
 
+		printf("deserialise token size\r\n");
+
 		mymemcpy(&ID, data, sizeof(ID));
-		message.tokenSize=myntohl(ID);
+		message->tokenSize=myntohl(ID);
 		data += sizeof(ID);
 
-		if(message.tokenSize > sizeof(message.token))
+		if(message->tokenSize > sizeof(message->token))
 		{
-			message.tokenSize = sizeof(message.token);
+			message->tokenSize = sizeof(message->token);
 			DEBUG(INFO,"[Parser] [ERROR] token size bigger than buffer size. Ignored extra data.\r\n");
 		}
 
-		mymemcpy(message.token, data, message.tokenSize);
-		data += message.tokenSize;
+		printf("deserialise token\r\n");
+
+		mymemcpy(message->token, data, message->tokenSize);
+		data += message->tokenSize;
 
 	}	else {
 		DEBUG(INFO,"ERROR\r\n");
 	}
-	return message;
+
+	printf("deserialise free message\r\n");
+
+	freePage(message);
+
+	printf("just before return from deserialize\r\n");
+
+	return *message;
 }
 
 

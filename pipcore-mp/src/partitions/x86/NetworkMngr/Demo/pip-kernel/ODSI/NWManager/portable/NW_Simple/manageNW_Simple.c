@@ -27,6 +27,11 @@
 #include "task.h"
 #include "semphr.h"
 
+#include <pip/fpinfo.h>
+#include <pip/debug.h>
+#include <pip/paging.h>
+#include <pip/compat.h>
+
 // static functions prototypes
 static int esp8266_restart();
 static int esp8266_wait_for_wifi_connection();
@@ -973,23 +978,39 @@ unsigned int esp8266_get_tcp_header(char *header)
 int esp8266_get_tcp_payload(unsigned int payload_size)
 {
 	unsigned int remaining_bytes = payload_size;
-	char rcv_buf[ESP8266_RCV_PAYLOAD_MAX_SIZE];
+	uint32_t rcv_buf_size = 4096;
+	char *rcv_buf = pvPortMalloc(rcv_buf_size);
+
+
+	if(rcv_buf == NULL)
+	{
+		printf("AllocPage failed !!!\r\n");
+		return 0;
+	}
+
+	//char rcv_buf[ESP8266_RCV_PAYLOAD_MAX_SIZE];
 
 	const TickType_t xDelay_1_ms = 1 ;
 
-	if(remaining_bytes > sizeof(rcv_buf))
+	printf("hello from get_tcp_payload 0\r\n");
+
+	if(remaining_bytes > rcv_buf_size)
 	{
 		remaining_bytes = 0;
 		DEBUG(CRITICAL, "tcp received segment payload is bigger than ESP8266_RCV_PAYLOAD_MAX_SIZE\r\n");
 	}
 
+	printf("hello from get_tcp_payload 1\r\n");
+
 	while(remaining_bytes > 0)
 	{
+		printf("hello from get_tcp_payload 2\r\n");
 		int read_size = vGalileo_UART0_read(rcv_buf, remaining_bytes);
-
+		printf("hello from get_tcp_payload 3\r\n");
 		if(read_size > 0)
 		{
 			// push the received bytes in the receive fifo
+			printf("push the received bytes in the receive fifo\r\n");
 
 			while(!fifo_push(&tcp_rcv_fifo, rcv_buf, read_size))
 			{
@@ -1001,6 +1022,10 @@ int esp8266_get_tcp_payload(unsigned int payload_size)
 			remaining_bytes -= read_size;
 		}
 	}
+
+	vPortFree(rcv_buf);
+
+	printf("just before return from get_tcp_payload\r\n");
 
 	return payload_size;
 }

@@ -141,6 +141,7 @@ void NW_Task( uint32_t *pvParameters )
 				// dispatch
 				printf("[Network Manager] dispatch_message_to_domain\r\n");
 				dispatch_message_to_domain(xQueue_domains_array, EventRequest, size_in);
+				printf("Back from dispatch message to domain !!!\r\n");
 			}
 
 			/*
@@ -290,7 +291,9 @@ static void read_from_esp8266()
 	if(read_size == 5)
 	{
 		// check if it is a tcp segment reception then return if yes
-		if(rcv_tcp_segment(rcv_buf))
+		int ret = rcv_tcp_segment(rcv_buf);
+		printf("return from rcv_tcp_segment\r\n");
+		if(ret)
 		{
 			return;
 		}
@@ -486,10 +489,12 @@ static int rcv_tcp_segment(char *rcv_buf)
 
 		unsigned int received_bytes_count = 0;
 		// continue reading the rest of the TCP header
+		printf("get_tcp_header\r\n");
 		received_bytes_count = esp8266_get_tcp_header(NULL);
 
 		if(received_bytes_count > 0)
 		{
+			printf("get_tcp_payload: %d\r\n", received_bytes_count);
 			// read TCP segment payload
 			esp8266_get_tcp_payload(received_bytes_count);
 		}
@@ -782,7 +787,13 @@ static int check_esp8266_received_data(char *rcv_buf)
 static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], event_t *p_EventRequest, uint32_t size_in)
 {
 	int ret = 0;
-	event_t EventToDisptach;
+	event_t *EventToDisptach = allocPage();
+
+	if(EventToDisptach == NULL)
+	{
+		printf("AllocPage failed !!!\r\n");
+		return 0;
+	}
 
 	QueueHandle_t xQueue_2OD_IC = xQueue_domains_array[0];
 	QueueHandle_t xQueue_2SP1D_IC = xQueue_domains_array[1];
@@ -790,17 +801,18 @@ static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], even
 	QueueHandle_t xQueue_2SP3D_IC = xQueue_domains_array[3];
 
 	// deserialize the incoming message
-	EventToDisptach.eventData.incomingMessage = deserialize_incomingMessage(p_EventRequest->eventData.nw.stream, size_in);
-	EventToDisptach.eventType = EXT_MESSAGE;
+	EventToDisptach->eventData.incomingMessage = deserialize_incomingMessage(p_EventRequest->eventData.nw.stream, size_in);
+	printf("Back from deserialize\r\n");
+	EventToDisptach->eventType = EXT_MESSAGE;
 
 	// send the message to corresponding domain if any.
-	switch(EventToDisptach.eventData.incomingMessage.domainID)
+	switch(EventToDisptach->eventData.incomingMessage.domainID)
 	{
 	case DEMO_OWNER_DOMAIN_ID: // owner domain
 		if( xQueue_2OD_IC != 0 )
 		{
 			/* block if the queue is already full. */
-			xQueueSend( xQueue_2OD_IC, &EventToDisptach, portMAX_DELAY );
+			xProtectedQueueSend( xQueue_2OD_IC, EventToDisptach, portMAX_DELAY );
 			ret = 1;
 		}
 		break;
@@ -808,7 +820,7 @@ static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], even
 		if( xQueue_2SP1D_IC != 0 )
 		{
 			/* block if the queue is already full. */
-			xQueueSend( xQueue_2SP1D_IC, &EventToDisptach, portMAX_DELAY );
+			xProtectedQueueSend( xQueue_2SP1D_IC, EventToDisptach, portMAX_DELAY );
 			ret = 1;
 		}
 		break;
@@ -816,7 +828,7 @@ static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], even
 		if( xQueue_2SP2D_IC != 0 )
 		{
 			/* block if the queue is already full. */
-			xQueueSend( xQueue_2SP2D_IC, &EventToDisptach, portMAX_DELAY );
+			xProtectedQueueSend( xQueue_2SP2D_IC, EventToDisptach, portMAX_DELAY );
 			ret = 1;
 		}
 		break;
@@ -824,13 +836,17 @@ static int dispatch_message_to_domain(QueueHandle_t xQueue_domains_array[], even
 		if( xQueue_2SP3D_IC != 0 )
 		{
 			/* block if the queue is already full. */
-			xQueueSend( xQueue_2SP3D_IC, &EventToDisptach, portMAX_DELAY );
+			xProtectedQueueSend( xQueue_2SP3D_IC, EventToDisptach, portMAX_DELAY );
 			ret = 1;
 		}
 		break;
 	default:
 		DEBUG(TRACE, "[NW_Manager] Incoming message rejected\r\n");
 	}
+
+	freePage(EventToDisptach);
+
+	printf("just before return from dispatch message to domain\r\n");
 
 	return ret;
 }
