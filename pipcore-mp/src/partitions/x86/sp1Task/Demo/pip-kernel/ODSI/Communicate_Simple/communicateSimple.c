@@ -1,7 +1,7 @@
 /*
  * communicateSimple.c
  *
- *  Created on: 21 déc. 2017
+ *  Created on: 21 dï¿½c. 2017
  *      Author: HZGF0437
  */
 
@@ -23,7 +23,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-
+#include <queueGlue.h>
 /**
  *
  * @param data
@@ -33,7 +33,7 @@
 uint32_t receive_simple(char* data, QueueHandle_t xQueue_P2IC){
 
 	event_t Event;
-	xQueueReceive( xQueue_P2IC, &Event, portMAX_DELAY ); //receive(data, src)
+	xProtectedQueueReceive( xQueue_P2IC, &Event, portMAX_DELAY ); //receive(data, src)
 	switch(Event.eventType){
 	case NW_IN:
 		mymemset(data, 0, IN_MAX_MESSAGE_SIZE);
@@ -51,6 +51,5 @@ void send_simple(char* data, QueueHandle_t xQueue_IC2P, uint32_t datasize){
 	mymemcpy(Event.eventData.nw.stream, data, datasize);
 	Event.eventData.nw.size=datasize;
 	DEBUG(TRACE, "Internal Communication sent a message\n");
-	xQueueSend( xQueue_IC2P, &Event, portMAX_DELAY );
+	xProtectedQueueSend( xQueue_IC2P, &Event, portMAX_DELAY );
 }
-

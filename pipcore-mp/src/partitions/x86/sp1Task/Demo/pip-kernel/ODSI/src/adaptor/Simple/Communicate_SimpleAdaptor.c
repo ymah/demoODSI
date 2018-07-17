@@ -49,7 +49,7 @@ event_t myreceive(char* data, QueueHandle_t xQueue_P2IC)
 	xProtectedQueueReceive( xQueue_P2IC, EventToReturn, portMAX_DELAY );
 
 	printf("Received\r\n");
-	return (event_t)*EventToReturn;
+	return *(event_t*)EventToReturn;
 }
 
 /*event_t myreceive(char* data, QueueHandle_t xQueue_P2IC){

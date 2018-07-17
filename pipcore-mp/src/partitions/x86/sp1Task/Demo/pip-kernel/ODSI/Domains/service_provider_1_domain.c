@@ -30,6 +30,13 @@
 #include <pip/compat.h>
 
 /*-----------------------------------------------------------*/
+extern int printf0(const char *format, ...);
+
+void printtruc(char * from,int size){
+	printf("BUFFER SIZE : %x content ",size);
+	for(int i=0; i<size;i++)
+		printf0("%x '%c'",from[i],((from[i]>=32)?from[i]:'.'));
+}
 
 void SP1D_Task( uint32_t *pvParameters )
 {
@@ -61,18 +68,19 @@ void SP1D_Task( uint32_t *pvParameters )
 	{
 		/* Receive data from Network manager or from Administration Manager*/
 		printf("Receiving something ?\r\n");
+
 		EventPartition = myreceive(INMES, xQueue_2SP1D);
+		//printtruc((char*)&EventPartition, sizeof(EventPartition));
 
 
 		incomingMessagecpy(&Check, &(EventPartition.eventData.incomingMessage) );
-		DEBUG(INFO,"UserID: %lu, DeviceID: %lu, DomainID: %lu, Instruction: %lu, Command Data: %s\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);
+		DEBUG(INFO,"UserID: %d, DeviceID: %d, DomainID: %d, Instruction: %d, Command Data: %s\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);
 
 		DEBUG(INFO,"Token:");
 		for(j=0 ; j<Check.tokenSize ; j++){
-			debug1("%02X", Check.token[j]);
+			Pip_Debug_PutDec(Check.token[j]);
 		}
-		debug1("\n");
-
+		printf("\r\n");
 		EventResponse = AdminManager_SP1D_Function(EventPartition);
 
 		eventcpy(&MessageToReturn,&EventResponse);
@@ -82,7 +90,7 @@ void SP1D_Task( uint32_t *pvParameters )
 
 		switch(EventResponse.eventType){
 		case INT_MESS_0:
-			xQueueSend(xQueue_2OD_IC, &EventResponse, portMAX_DELAY);
+			xProtectedQueueSend(xQueue_2OD_IC, &EventResponse, portMAX_DELAY);
 			//mysend(1, OUTMES, xQueue_2OD_IC, sizeout);
 
 			break;

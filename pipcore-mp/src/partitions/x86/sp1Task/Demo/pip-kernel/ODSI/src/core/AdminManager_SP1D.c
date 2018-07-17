@@ -36,6 +36,8 @@ event_t AdminManager_SP1D_Function( event_t ReceivedEvent )
 	 */
 	while(1)
 	{
+		printf("AdminManager_SP1D_Function \r\n" );
+		printf("ReceivedEvent.eventType %d\r\n",ReceivedEvent.eventType);
 		switch(ReceivedEvent.eventType){
 		case INT_RESP_1:
 			DEBUG(TRACE,"Sending command to destination\r\n");

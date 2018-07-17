@@ -238,4 +238,3 @@ response_t deserialize_response(char* data, uint32_t size_total){
 	}
 	return response;
 }
-
