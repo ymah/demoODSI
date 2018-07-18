@@ -70,7 +70,7 @@
 
 
 		EventPartition = myreceive(INMES, xQueue_2OD);
-		for(;;);
+
 		printf("Received something\r\n");
 		incomingMessagecpy(&Check, &(EventPartition.eventData.incomingMessage) );
 		DEBUG(INFO,"UserID: %lu, DeviceID: %lu, DomainID: %lu, Instruction: %lu, Command Data: %s\r\n", Check.userID, Check.deviceID, Check.domainID, Check.command.instruction, Check.command.data);
