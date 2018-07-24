@@ -1,8 +1,8 @@
 /*
  * NWManager.c
  *
- *  Created on: 18 d�c. 2017
- *      Author: HZGF0437
+ *  Created on: 1 April 2018
+ *  Author: SWHX7055
  */
 
 
