@@ -75,9 +75,9 @@
 #include "cpuidh.h"
 
 #include "NWManager.h"
+#include "UART0.h"
 #include "UART0_DMA.h"
 #include "esp8266.h"
-#include "UART0.h"
 #include "Galileo_Gen2_Board.h"
 /*
 #include "NWManager.h"
@@ -89,7 +89,6 @@
 #include "ConfigManager.h"
 #include "KeyManager.h"
 */
-
 
 /*f a [potential] error has been detected.  Increasing the toggle rate in the
   presense of an error gives visual feedback of the system status. */
@@ -189,6 +188,7 @@ void main()
 
 	set_dma_buffer(queueTab[5]);
 	set_v_dma_buffer(queueTab[6]);
+	vInitializeGalileo_client_SerialPort_Base();
 	vInitializeGalileo_client_SerialPort_RCVR_DMA_Base();
 
 	NW_Task(queueTab);
