@@ -75,9 +75,9 @@
 #include "cpuidh.h"
 
 #include "NWManager.h"
-#include "UART_DMA.h"
+#include "UART0_DMA.h"
 #include "esp8266.h"
-#include "Quark_x1000_support.h"
+#include "UART0.h"
 #include "Galileo_Gen2_Board.h"
 /*
 #include "NWManager.h"
@@ -189,7 +189,7 @@ void main()
 
 	set_dma_buffer(queueTab[5]);
 	set_v_dma_buffer(queueTab[6]);
-	vInitializeGalileo_client_SerialPort_RCVR_DMA();
+	vInitializeGalileo_client_SerialPort_RCVR_DMA_Base();
 
 	NW_Task(queueTab);
 	for(;;);
