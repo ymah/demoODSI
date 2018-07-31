@@ -54,7 +54,7 @@ BLINKY_DIR=$(IA32DIR)/Blinky_Demo
 FULL_DIR=$(IA32DIR)/Full_Demo
 FULL_DIR_TASK=$(ROOTDIR)/Demo/Common/Minimal/
 
-SYSTEM_CALLS_IMPLEMENTATION_SRC=$(IA32DIR)/System/SystemCalls.c
+SYSTEM_CALLS_IMPLEMENTATION_SRC=$(IA32DIR)/../../../Common/System/SystemCalls.c
 
 # IA32 RTOS files
 SUPPORT_SRC=$(wildcard $(SUPPORT_DIR)/*.c)
