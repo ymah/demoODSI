@@ -79,6 +79,7 @@
 #include "UART0_DMA.h"
 #include "esp8266.h"
 #include "Galileo_Gen2_Board.h"
+#include "CommonStructure.h"
 /*
 #include "NWManager.h"
 #include "Internal_Communication.h"
@@ -190,6 +191,8 @@ void main()
 	set_v_dma_buffer(queueTab[6]);
 	vInitializeGalileo_client_SerialPort_Base();
 	vInitializeGalileo_client_SerialPort_RCVR_DMA_Base();
+
+	set_this_device_id(ODSI_DEMO_BOARD_A_UNIVERSAL_DEVICE_ID);
 
 	NW_Task(queueTab);
 	for(;;);
