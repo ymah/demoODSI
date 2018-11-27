@@ -76,20 +76,28 @@
 
 #include "domains.h"
 
-/*
-#include "NWManager.h"
-#include "Internal_Communication.h"
-#include "CommonStructure.h"
-#include "MyAppConfig.h"
-#include "TokenValidator.h"
-#include "AdminManager.h"
-#include "ConfigManager.h"
-#include "KeyManager.h"
-*/
 
+
+
+/* Standard includes. */
+#include "stdint.h"
+#include "string.h"
+
+#include "structcopy.h"
+#include <AdminManagers.h>
+#include "CommonStructure.h"
+#include "InternalCommunication_Interface.h"
+#include "debug.h"
+
+/* Kernel includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+
+#include "SystemCalls.h"
 
 /*f a [potential] error has been detected.  Increasing the toggle rate in the
-presense of an error gives visual feedback of the system status. */
+  presense of an error gives visual feedback of the system status. */
 #define mainNO_ERROR_CHECK_TASK_PERIOD      pdMS_TO_TICKS( 5000UL )
 #define mainERROR_CHECK_TASK_PERIOD         pdMS_TO_TICKS( 1000UL )
 
@@ -104,30 +112,15 @@ presense of an error gives visual feedback of the system status. */
 #define mainTIMER_TEST_PERIOD               ( 50 )
 
 /* Parameters that are passed into the check tasks for no other purpose other
-* than to check the port does this correctly. */
+ * than to check the port does this correctly. */
 #define mainREG_TEST_1_PARAMETER            ( 0x12345678UL )
 #define mainREG_TEST_2_PARAMETER            ( 0x87654321UL )
 
-/*-----------------------------------------------------------*/
-
 /*
-*  * The function that implements the check task, as described at the top of this
-*   * file.
-*    */
-static void prvCheckTask( void *pvParameters );
-
-/*
-*  * Entry points for the register check tasks, as described at the top of this
-*   * file.
-*    */
-static void prvRegTest1Entry( void *pvParameters );
-static void prvRegTest2Entry( void *pvParameters );
-
-/*
-*  * The implementation of the register check tasks, which are implemented in
-*   * RegTest.S.  These functions are called by prvRegTest1Entry() and
-*    * prvRegTest2Entry() respectively.
-*     */
+ *  * The implementation of the register check tasks, which are implemented in
+ *   * RegTest.S.  These functions are called by prvRegTest1Entry() and
+ *    * prvRegTest2Entry() respectively.
+ *     */
 /*-----------------------------------------------------------*/
 
 /* Constants used by the register check tasks when checking the FPU registers. */
@@ -135,96 +128,88 @@ const double dRegTest1_st7 = 7.0, dRegTest1_st6 = 6.0, dRegTest1_st5 = 5.0, dReg
 const double dRegTest2_st7 = 700.0, dRegTest2_st6 = 600.0, dRegTest2_st5 = 500.0, dRegTest2_st4 = 400.0, dRegTest2_st3 = 300.0, dRegTest2_st2 = 200.0, dRegTest2_st1 = 100.0;
 
 /* Counters used by the register check tasks to indicate that they are still
-* executing without having discovered any errors. */
+ * executing without having discovered any errors. */
 volatile uint32_t ulRegTest1Counter, ulRegTest2Counter;
 volatile uint32_t ulCheckLoops = 0;
 
-
-
-
-//
-//
-// extern void* _partition1, *_epartition1;
-// extern void* _partition2, *_epartition2;
-// extern void* _partition3, *_epartition3;
-// extern void* _partition4, *_epartition4;
-// extern void* _partition5, *_epartition5;
-//
-// static const struct {uint32_t start, end;} part1 = {
-// 	(uint32_t)&_partition1, (uint32_t)&_epartition1,
-// };
-//
-//
-// static const struct {uint32_t start, end;} part2 = {
-// 	(uint32_t)&_partition2, (uint32_t)&_epartition2,
-// };
-//
-// static const struct {uint32_t start, end;} part3 = {
-// 	(uint32_t)&_partition3, (uint32_t)&_epartition3,
-// };
-//
-// static const struct {uint32_t start, end;} part4 = {
-// 	(uint32_t)&_partition4, (uint32_t)&_epartition4,
-// };
-//
-// static const struct {uint32_t start, end;} part5 = {
-// 	(uint32_t)&_partition5, (uint32_t)&_epartition5,
-// };
-
 void parse_bootinfo(pip_fpinfo* bootinfo)
 {
-  if(bootinfo->magic == FPINFO_MAGIC)
-  printf("\tBootinfo seems to be correct.\r\n");
-  else {
-    printf("\tBootinfo is invalid. Aborting.\r\n");
-  }
+    if(bootinfo->magic == FPINFO_MAGIC)
+        printf("\tBootinfo seems to be correct.\r\n");
+    else {
+        printf("\tBootinfo is invalid. Aborting.\r\n");
+    }
+
+    printf("\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
 
 
-  printf("\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
-
-
-  printf("\tPip revision %s\r\n",bootinfo->revision);
-  return;
+    printf("\tPip revision %s\r\n",bootinfo->revision);
+    return;
 }
 
 
+/*-----------------------------------------------------------*/
 uint32_t * queueTab;
+
+void sp2d_Task()
+{
+
+	QueueHandle_t xQueue_2NW = (QueueHandle_t*) queueTab[0];
+	QueueHandle_t xQueue_2OD = (QueueHandle_t*) queueTab[1];
+	QueueHandle_t xQueue_2SP2D = (QueueHandle_t*) queueTab[2];
+
+	event_t * EventRequest = malloc_for_queues_adaptor(sizeof(event_t));
+	event_t * EventResponse = malloc_for_queues_adaptor(sizeof(event_t));
+
+	eventinit(EventRequest);
+	eventinit(EventResponse);
+
+	for( ;; )
+	{
+		/*
+		 * Receive data from Network manager
+		 */
+		myreceive(xQueue_2SP2D, EventRequest);
+
+		AdminManagerFunction(EventRequest, EventResponse, 0);
+
+		/*
+		 * Send data to Network manager
+		 */
+		mysend(xQueue_2NW, EventResponse);
+
+		/*Reinitialize events*/
+		eventreset(EventRequest);
+		eventreset(EventResponse);
+	}
+}
 
 void main()
 {
+	pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
+	//Get Bootinfo for the available memory
+	parse_bootinfo(bootinfo);
+	initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+	initQueueService();
 
-  pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
-  //Get Bootinfo for the available memory
-  parse_bootinfo(bootinfo);
-  initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
-  initQueueService();
+	printf("Finished initializing somethings\r\n");
 
-  printf("Finished initializing somethings\r\n");
+	printf("Queues provided by my father \r\n");
+	queueTab = pvPortMalloc(3*sizeof(uint32_t));
 
+	for(int i =1;i<=3;i++)
+	{
+		queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
+		printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
+	}
 
-    printf("Queues provided by my father \r\n");
-    queueTab = pvPortMalloc(5*sizeof(uint32_t));
-    for(int i =1;i<=3;i++){
-      queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
-      printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
-    }
-    printf("Starting OD task with %x\r\n",queueTab);
+	printf("Starting SP2D task with %x\r\n",queueTab);
 
-  //od_Task2( 0xDEADBEEF );
-      SP2D_Task( queueTab );
-    //xTaskCreate(&SP2D_Task,"SP2D tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
-    //vTaskStartScheduler();
-
-  for(;;);
+	sp2d_Task();
 }
 
-
-
-
-
-
 void vApplicationMallocFailedHook(){
-  return ;
+    return ;
 }
 
 void vAssertCalled(const char * file, unsigned long line){

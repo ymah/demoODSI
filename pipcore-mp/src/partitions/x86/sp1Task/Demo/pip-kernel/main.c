@@ -203,7 +203,7 @@ void main()
 		printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
 	}
 
-	printf("Starting OD task with %x\r\n",queueTab);
+	printf("Starting SP1D task with %x\r\n",queueTab);
 
 	sp1d_Task();
 }
