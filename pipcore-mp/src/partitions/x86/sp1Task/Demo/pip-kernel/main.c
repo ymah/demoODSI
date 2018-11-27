@@ -76,17 +76,25 @@
 
 #include "domains.h"
 
-/*
-#include "NWManager.h"
-#include "Internal_Communication.h"
-#include "CommonStructure.h"
-#include "MyAppConfig.h"
-#include "TokenValidator.h"
-#include "AdminManager.h"
-#include "ConfigManager.h"
-#include "KeyManager.h"
-*/
 
+
+
+/* Standard includes. */
+#include "stdint.h"
+#include "string.h"
+
+#include "structcopy.h"
+#include <AdminManagers.h>
+#include "CommonStructure.h"
+#include "InternalCommunication_Interface.h"
+#include "debug.h"
+
+/* Kernel includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+
+#include "SystemCalls.h"
 
 /*f a [potential] error has been detected.  Increasing the toggle rate in the
   presense of an error gives visual feedback of the system status. */
@@ -108,21 +116,6 @@
 #define mainREG_TEST_1_PARAMETER            ( 0x12345678UL )
 #define mainREG_TEST_2_PARAMETER            ( 0x87654321UL )
 
-/*-----------------------------------------------------------*/
-
-/*
- *  * The function that implements the check task, as described at the top of this
- *   * file.
- *    */
-static void prvCheckTask( void *pvParameters );
-
-/*
- *  * Entry points for the register check tasks, as described at the top of this
- *   * file.
- *    */
-static void prvRegTest1Entry( void *pvParameters );
-static void prvRegTest2Entry( void *pvParameters );
-
 /*
  *  * The implementation of the register check tasks, which are implemented in
  *   * RegTest.S.  These functions are called by prvRegTest1Entry() and
@@ -139,38 +132,6 @@ const double dRegTest2_st7 = 700.0, dRegTest2_st6 = 600.0, dRegTest2_st5 = 500.0
 volatile uint32_t ulRegTest1Counter, ulRegTest2Counter;
 volatile uint32_t ulCheckLoops = 0;
 
-
-
-
-
-//
-// extern void* _partition1, *_epartition1;
-// extern void* _partition2, *_epartition2;
-// extern void* _partition3, *_epartition3;
-// extern void* _partition4, *_epartition4;
-// extern void* _partition5, *_epartition5;
-//
-// static const struct {uint32_t start, end;} part1 = {
-// 	(uint32_t)&_partition1, (uint32_t)&_epartition1,
-// };
-//
-//
-// static const struct {uint32_t start, end;} part2 = {
-// 	(uint32_t)&_partition2, (uint32_t)&_epartition2,
-// };
-//
-// static const struct {uint32_t start, end;} part3 = {
-// 	(uint32_t)&_partition3, (uint32_t)&_epartition3,
-// };
-//
-// static const struct {uint32_t start, end;} part4 = {
-// 	(uint32_t)&_partition4, (uint32_t)&_epartition4,
-// };
-//
-// static const struct {uint32_t start, end;} part5 = {
-// 	(uint32_t)&_partition5, (uint32_t)&_epartition5,
-// };
-
 void parse_bootinfo(pip_fpinfo* bootinfo)
 {
     if(bootinfo->magic == FPINFO_MAGIC)
@@ -178,7 +139,6 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
     else {
         printf("\tBootinfo is invalid. Aborting.\r\n");
     }
-
 
     printf("\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
 
@@ -188,46 +148,65 @@ void parse_bootinfo(pip_fpinfo* bootinfo)
 }
 
 
-
-
-
-
+/*-----------------------------------------------------------*/
 uint32_t * queueTab;
 
+void sp1d_Task()
+{
 
+	QueueHandle_t xQueue_2NW = (QueueHandle_t*) queueTab[0];
+	QueueHandle_t xQueue_2OD = (QueueHandle_t*) queueTab[1];
+	QueueHandle_t xQueue_2SP1D = (QueueHandle_t*) queueTab[2];
+
+	event_t * EventRequest = malloc_for_queues_adaptor(sizeof(event_t));
+	event_t * EventResponse = malloc_for_queues_adaptor(sizeof(event_t));
+
+	eventinit(EventRequest);
+	eventinit(EventResponse);
+
+	for( ;; )
+	{
+		/*
+		 * Receive data from Network manager
+		 */
+		myreceive(xQueue_2SP1D, EventRequest);
+
+		AdminManagerFunction(EventRequest, EventResponse, 0);
+
+		/*
+		 * Send data to Network manager
+		 */
+		mysend(xQueue_2NW, EventResponse);
+
+		/*Reinitialize events*/
+		eventreset(EventRequest);
+		eventreset(EventResponse);
+	}
+}
 
 void main()
 {
+	pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
+	//Get Bootinfo for the available memory
+	parse_bootinfo(bootinfo);
+	initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+	initQueueService();
 
-  pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
-  //Get Bootinfo for the available memory
-  parse_bootinfo(bootinfo);
-  initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
-  initQueueService();
+	printf("Finished initializing somethings\r\n");
 
-  printf("Finished initializing somethings\r\n");
+	printf("Queues provided by my father \r\n");
+	queueTab = pvPortMalloc(3*sizeof(uint32_t));
 
+	for(int i =1;i<=3;i++)
+	{
+		queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
+		printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
+	}
 
-    printf("Queues provided by my father \r\n");
-    queueTab = pvPortMalloc(5*sizeof(uint32_t));
-    for(int i =1;i<=3;i++){
-      queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
-      printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
-    }
-    printf("Starting OD task with %x\r\n",queueTab);
+	printf("Starting OD task with %x\r\n",queueTab);
 
-  //od_Task2( 0xDEADBEEF );
-  	   SP1D_Task( queueTab );
-    //xTaskCreate(&SP1D_Task,"SP1D tas",configMINIMAL_STACK_SIZE*5,queueTab,configMAX_PRIORITIES-1,NULL);
-    //vTaskStartScheduler();
-
-    for(;;);
+	sp1d_Task();
 }
-
-
-
-
-
 
 void vApplicationMallocFailedHook(){
     return ;
