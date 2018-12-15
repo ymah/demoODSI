@@ -127,7 +127,7 @@ clean:
 	rm -rf function_addr.fun
 
 $(IMAGE): $(RTOS_OBJ) $(RTOS_IA32OBJ) $(SUPPORT_OBJ) $(BLINKY_OBJ) $(FULL_OBJ) $(FULL_TASK_OBJ) $(DEMO_OBJ) $(SYSTEM_CALLS_IMPLEMENTATION_OBJ) $(SKIPOBJ) $(RTOS_MEMOBJ)
-
+	echo "Linking..."
 	mkdir -pv $(BUILD_DIR)
 	$(LD) $(LDFLAGS) $^ -o $@ -lgcc -lpip -lfreertos -lodsi
 	$(LD) $(LDFLAGS) $^ -o $(BUILD_DIR)/$@ -lgcc -lpip -lfreertos -lodsi

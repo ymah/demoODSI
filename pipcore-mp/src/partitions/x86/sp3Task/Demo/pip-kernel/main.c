@@ -171,7 +171,7 @@ void sp3d_Task()
 		 */
 		myreceive(xQueue_2SP3D, EventRequest);
 
-		AdminManagerFunction(EventRequest, EventResponse, 0);
+		AdminManagerFunction(EventRequest, EventResponse, 1);
 
 		/*
 		 * Send data to Network manager
